@@ -142,8 +142,12 @@
 }
 
 .die-display {
-    width: 4rem;
-    height: 4rem;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 5rem;
+    height: 5rem;
     border: none;
     background: none;
 }
@@ -152,3 +156,29 @@
     border: none;
     background: none;
 }
+
+.die-display-value {
+    position: absolute;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bolder;
+    font-size: 1.75rem;
+    padding: 0.1rem;
+    /* margin: 1rem 1rem .9rem; */
+    text-shadow: -1px -1px 0 red, 1px -1px 0 red, -1px 1px 0 red, 1px 1px 0 red;
+    z-index: 1;
+}
+
+/* .die-display-value::before {
+    position: absolute;
+    content: "";
+    width: 60%;
+    height: 60%;
+    z-index: -1;
+    background: rgb(255, 0, 0);
+    border: 0.19rem solid rgb(255, 0, 0);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+} */

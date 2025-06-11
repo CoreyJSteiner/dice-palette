@@ -1,14 +1,15 @@
+import type Die from "./Die"
 import DieImage from "./DieImage"
 
 type DieDisplayProps = {
-    imageName?: string
-    dieSides: number
+    die: Die
 }
 
-const DieDisplay: React.FC<DieDisplayProps> = ({ imageName = 'd20', dieSides = 20 }) => {
+const DieDisplay: React.FC<DieDisplayProps> = ({ die }) => {
     return (
         <button className='die-display'>
-            <DieImage imageName={imageName} alt={dieSides.toString()} />
+            <DieImage imageName={`d${die.dieSides}`} alt={die.dieSides.toString()} />
+            <h1 className="die-display-value" rolled-value={die.dieValue}>{die.dieValue}</h1>
         </button>
     )
 }

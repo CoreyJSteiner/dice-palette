@@ -14,8 +14,7 @@ const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick }) => {
                 {dice.map(die => (
                     <DieDisplay
                         key={die.key}
-                        imageName={`d${die.dieSides}`}
-                        dieSides={die.dieSides}
+                        die={die}
                     />
                 ))}
             </div>
