@@ -191,7 +191,7 @@
     height: 5rem;
     border: none;
     background: none;
-    user-select: none;
+    user-select: all;
 }
 
 .die-display:hover {
@@ -206,13 +206,12 @@
     font-weight: bolder;
     font-size: 1.75rem;
     padding: 0.1rem;
-    /* margin: 1rem 1rem .9rem; */
     text-shadow: -1px -1px 0 red, 1px -1px 0 red, -1px 1px 0 red, 1px 1px 0 red;
     z-index: 1;
     user-select: none;
 }
 
 .dice-group-container {
-    border: 1px solid black;
+    border: 0.1rem solid black;
     border-radius: 1rem;
 }

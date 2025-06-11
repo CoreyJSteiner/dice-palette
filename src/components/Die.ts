@@ -2,11 +2,13 @@ class Die {
     key: string
     dieSides: number
     dieValue?: number
+    groupKey: string | undefined | null
 
-    constructor(key: string, dieSides: number, dieValue?: number) {
+    constructor(key: string, dieSides: number, dieValue?: number, groupKey?: string) {
         this.key = key
         this.dieSides = dieSides
         this.dieValue = dieValue
+        this.groupKey = groupKey
     }
 
     roll(): number {
