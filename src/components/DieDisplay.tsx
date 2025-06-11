@@ -3,14 +3,17 @@ import DieImage from "./DieImage"
 
 type DieDisplayProps = {
     die: Die
+    handleClick?: (key: string) => void
 }
 
-const DieDisplay: React.FC<DieDisplayProps> = ({ die }) => {
+const DieDisplay: React.FC<DieDisplayProps> = ({ die, handleClick }) => {
+
+
     return (
-        <button className='die-display'>
+        <button draggable='true' className='die-display' onClick={() => handleClick ? handleClick(die.key) : null}>
             <DieImage imageName={`d${die.dieSides}`} alt={die.dieSides.toString()} />
-            <h1 className="die-display-value" rolled-value={die.dieValue}>{die.dieValue}</h1>
-        </button>
+            <h1 className="die-display-value">{die.dieValue}</h1>
+        </button >
     )
 }
 

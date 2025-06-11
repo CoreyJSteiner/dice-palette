@@ -6,11 +6,11 @@ class Die {
     constructor(key: string, dieSides: number, dieValue?: number) {
         this.key = key
         this.dieSides = dieSides
-        this.dieValue = dieValue || 1
+        this.dieValue = dieValue
     }
 
     roll(): number {
-        const rollVal = 1
+        const rollVal = Math.floor(Math.random() * this.dieSides + 1)
         this.dieValue = rollVal
 
         return rollVal

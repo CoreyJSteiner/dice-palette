@@ -4,10 +4,11 @@ import type Die from "./Die"
 
 type DiePoolProps = {
     dice: Array<Die>
+    onDieClick: (key: string) => void
     onClearClick: () => void
 }
 
-const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick }) => {
+const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick, onDieClick }) => {
     return (
         <div className="die-pool-container">
             <div className="die-pool">
@@ -15,6 +16,7 @@ const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick }) => {
                     <DieDisplay
                         key={die.key}
                         die={die}
+                        handleClick={onDieClick}
                     />
                 ))}
             </div>
