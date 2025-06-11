@@ -1,8 +1,9 @@
 import type React from "react"
 import DieDisplay from "./DieDisplay"
+import type Die from "./Die"
 
 type DiePoolProps = {
-    dice: Array<number>
+    dice: Array<Die>
     onClearClick: () => void
 }
 
@@ -12,9 +13,9 @@ const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick }) => {
             <div className="die-pool">
                 {dice.map(die => (
                     <DieDisplay
-                        key={crypto.randomUUID()}
-                        imageName={`d${die}`}
-                        dieSides={die}
+                        key={die.key}
+                        imageName={`d${die.dieSides}`}
+                        dieSides={die.dieSides}
                     />
                 ))}
             </div>

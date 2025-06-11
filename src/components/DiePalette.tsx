@@ -2,17 +2,17 @@ import { useState } from 'react'
 import './DieComponent.css'
 import DieOptions from "./DieOptions"
 import DiePool from "./DiePool"
+import Die from './Die'
 
 const DiePallete = () => {
-    const [dice, setDice] = useState(Array<number>)
+    const [dice, setDice] = useState(Array<Die>)
 
     const handleClearDice = () => {
         setDice([])
     }
 
-    const handleAddDie = (die: number) => {
-        setDice([...dice, die])
-        console.log(dice)
+    const handleAddDie = (dieSides: number) => {
+        setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
     }
 
     return (
