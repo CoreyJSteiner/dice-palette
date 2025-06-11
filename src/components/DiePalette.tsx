@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import './DieComponent.css'
 import DieOptions from "./DieOptions"
 import DiePool from "./DiePool"
@@ -26,34 +26,36 @@ const DiePallete: React.FC = () => {
         setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
     }
 
-    const handleDieClick = (key: string) => {
+    const dieReplace = useCallback((die: Die, dieKey: string): Die => {
+        if (die.key === dieKey) {
+            const newDie = new Die(die.key, die.dieSides)
+            newDie.roll()
+            return newDie
+        }
+
+        return die
+    }, [])
+
+    const handleDieClick = (dieKey: string) => {
         setDice(prevDice => prevDice.map(die => {
-            if (die.key === key) {
-                const newDie = new Die(die.key, die.dieSides);
-                newDie.roll();
-                return newDie;
-            }
-            return die;
+            return dieReplace(die, dieKey)
         }));
     }
 
     const handleDieInGroupClick = (groupKey: string, dieKey: string) => {
-        console.log(groupKey + '||' + dieKey)
-        setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
+        const diceGroupReplace = (diceGroup: DiceGroup): DiceGroup => {
             if (diceGroup.key === groupKey) {
                 const newDice = diceGroup.dice.map(die => {
-                    if (die.key === dieKey) {
-                        const newDie = new Die(die.key, die.dieSides)
-                        newDie.roll()
-                        return newDie
-                    }
-
-                    return die
+                    return dieReplace(die, dieKey)
                 })
 
                 return new DiceGroup(diceGroup.key, newDice)
             }
             return diceGroup
+        }
+
+        setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
+            return diceGroupReplace(diceGroup)
         }));
     }
 
