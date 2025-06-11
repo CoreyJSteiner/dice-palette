@@ -1,25 +1,24 @@
 import type React from "react"
 import DieDisplay from "./DieDisplay"
 
-const DiePool: React.FC = () => {
+type DiePoolProps = {
+    dice: Array<number>
+    onClearClick: () => void
+}
+
+const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick }) => {
     return (
         <div className="die-pool-container">
             <div className="die-pool">
-                <DieDisplay imageName="d4" dieSides={4} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
-                <DieDisplay imageName="d10" dieSides={10} />
+                {dice.map(die => (
+                    <DieDisplay
+                        key={crypto.randomUUID()}
+                        imageName={`d${die}`}
+                        dieSides={die}
+                    />
+                ))}
             </div>
-            <button className="clear-button">Clear</button>
+            <button className="clear-button" onClick={onClearClick}>Clear</button>
         </div>
     )
 }
