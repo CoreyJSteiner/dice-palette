@@ -1,0 +1,152 @@
+.die-pallete {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+    background: #c1c1c1;
+    border-radius: 1rem;
+}
+
+.die-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0rem 2rem;
+    width: 36rem;
+    height: 4rem;
+    margin: 1rem 1rem 0rem;
+    background: hsl(232, 100%, 96%);
+    border-radius: 1rem 1rem 0rem 0rem;
+}
+
+.die-pool-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40rem;
+    height: 16rem;
+    margin: 0rem 1rem 1rem;
+    background: hsl(0, 34%, 88%);
+    border-radius: 0rem 0rem 1rem 1rem;
+}
+
+.clear-button {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+.clear-button:hover {
+    background: none;
+    transform: scale(108%);
+}
+
+.clear-button:active {
+    background: none;
+    transform: scale(90%);
+}
+
+.die-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0.1rem;
+    border: none;
+    background: none;
+}
+
+.die-button:hover {
+    background: none;
+}
+
+.die-button:hover .die-img {
+    filter: invert(16%) sepia(99%) saturate(7404%) hue-rotate(4deg) brightness(30%) contrast(118%);
+}
+
+.die-img-container {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.die-img,
+.die-fill {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.die-fill {
+    position: absolute;
+    z-index: 0;
+    width: 95%;
+    height: 95%;
+    filter: invert(16%) sepia(99%) saturate(7404%) hue-rotate(4deg) brightness(95%) contrast(118%);
+}
+
+.die-img {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes shudder {
+    0% {
+        transform: translateY(0);
+    }
+
+    25% {
+        transform: translateY(0.2rem);
+        scale: 98%;
+    }
+
+    50% {
+        transform: translateY(0.4rem);
+        scale: 92%;
+    }
+
+    75% {
+        transform: translateY(0.2rem);
+        scale: 90%;
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+.die-button:active>* {
+    animation: shudder 0.15s linear;
+}
+
+.die-pool {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.die-display {
+    width: 4rem;
+    height: 4rem;
+    border: none;
+    background: none;
+}
+
+.die-display:hover {
+    border: none;
+    background: none;
+}
