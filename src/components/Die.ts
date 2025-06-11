@@ -12,6 +12,7 @@ class Die {
     roll(): number {
         const rollVal = Math.floor(Math.random() * this.dieSides + 1)
         this.dieValue = rollVal
+        console.log(`d${this.dieSides}-${this.key}: ${rollVal}`)
 
         return rollVal
     }

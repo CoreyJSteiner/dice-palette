@@ -1,14 +1,25 @@
 import type React from "react"
 import DieDisplay from "./DieDisplay"
-import type Die from "./Die"
+import DiceGroupDisplay from "./DiceGroupDisplay"
+import Die from "./Die"
+import DiceGroup from "./DiceGroup"
 
 type DiePoolProps = {
     dice: Array<Die>
-    onDieClick: (key: string) => void
-    onClearClick: () => void
+    diceGroups: Array<DiceGroup>
+    dieClickHandler: (key: string) => void
+    dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
+    clearClickHandler: () => void
 }
 
-const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick, onDieClick }) => {
+const DiePool: React.FC<DiePoolProps> = ({
+    dice = [],
+    diceGroups = [],
+    clearClickHandler,
+    dieClickHandler,
+    dieInGroupClickHandler
+}) => {
+
     return (
         <div className="die-pool-container">
             <div className="die-pool">
@@ -16,11 +27,18 @@ const DiePool: React.FC<DiePoolProps> = ({ dice = [], onClearClick, onDieClick }
                     <DieDisplay
                         key={die.key}
                         die={die}
-                        handleClick={onDieClick}
+                        dieClickHandler={dieClickHandler}
+                    />
+                ))}
+                {diceGroups.map(diceGroup => (
+                    <DiceGroupDisplay
+                        key={'1'}
+                        diceGroup={diceGroup}
+                        dieInGroupClickHandler={dieInGroupClickHandler}
                     />
                 ))}
             </div>
-            <button className="clear-button" onClick={onClearClick}>Clear</button>
+            <button className="clear-button" onClick={clearClickHandler}>Clear</button>
         </div>
     )
 }
