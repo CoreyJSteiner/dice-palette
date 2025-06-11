@@ -11,7 +11,7 @@ type DiePoolProps = {
     dieClickHandler: (key: string) => void
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
     clearClickHandler: () => void
-    addToGroupHandler: (dieKey: string, groupKey: string | null) => void
+    addToGroupHandler: (dieData: Die, groupKey: string | null) => void
 }
 
 const DiePool: React.FC<DiePoolProps> = ({

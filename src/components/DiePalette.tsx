@@ -74,7 +74,10 @@ const DiePallete: React.FC = () => {
                 const newGroup = new DiceGroup(diceGroup.key, newDice)
                 return newGroup
             }))
-            setDice([...dice, new Die(dieData.key, dieData.dieSides, dieData.dieValue, null)])
+            setDice([
+                ...dice,
+                new Die(dieData.key, dieData.dieSides, dieData.dieValue, undefined)
+            ])
         }
 
 
