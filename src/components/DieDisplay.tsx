@@ -1,13 +1,21 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import type Die from "./Die"
 import DieImage from "./DieImage"
+import type { CSSProperties } from "react"
 
 type DieDisplayProps = {
     die: Die
     dieClickHandler?: (key: string) => void
+    fillColor?: string
+    valueFontColor?: string
 }
 
-const DieDisplay: React.FC<DieDisplayProps> = ({ die, dieClickHandler }) => {
+const DieDisplay: React.FC<DieDisplayProps> = ({
+    die,
+    dieClickHandler,
+    fillColor = 'magenta',
+    valueFontColor = 'yellow'
+}) => {
     const { setNodeRef: setDropRef } = useDroppable({
         id: die.key,
         data: die
@@ -23,7 +31,12 @@ const DieDisplay: React.FC<DieDisplayProps> = ({ die, dieClickHandler }) => {
         setDropRef(node);
     };
 
-    const style = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined
+    const styleTransform = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined
+
+    const styleValueFont: CSSProperties = {
+        '--value-font-color': valueFontColor,
+        '--value-font-border-color': fillColor,
+    } as CSSProperties
 
     const handleRightClick = (e: React.MouseEvent) => {
         if (dieClickHandler) {
@@ -40,10 +53,10 @@ const DieDisplay: React.FC<DieDisplayProps> = ({ die, dieClickHandler }) => {
             draggable='true'
             className='die-display'
             onContextMenu={handleRightClick}
-            style={style}
+            style={styleTransform}
         >
-            <DieImage imageName={`d${die.dieSides}`} alt={die.dieSides.toString()} />
-            <h1 className="die-display-value">{die.dieValue}</h1>
+            <DieImage imageName={`d${die.dieSides}`} fillColor={fillColor} />
+            <h1 className="die-display-value" style={styleValueFont}>{die.dieValue}</h1>
         </button >
     )
 }

@@ -1,15 +1,31 @@
+import type { CSSProperties } from 'react'
+
 type DieImageProps = {
     imageName?: string
-    alt?: string
+    fillColor?: string
 }
 
 const IMG_BASE_PATH = '../../'
 
-const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20' }) => {
+const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20', fillColor = 'red' }) => {
+    const styleFill: CSSProperties = {
+        '--fill-color': fillColor,
+    } as CSSProperties
+
+    const maskStyle: CSSProperties = {
+        maskImage: `url(${IMG_BASE_PATH}${imageName}_fill.png)`,
+        WebkitMaskImage: `url(${IMG_BASE_PATH}${imageName}_fill.png)`,
+    } as CSSProperties
+
     return (
-        <div className='die-img-container'>
+        <div className='die-img-container' style={styleFill}>
             <img draggable='false' className='die-img' src={IMG_BASE_PATH + imageName + '.png'} />
-            <img draggable='false' className='die-fill' src={IMG_BASE_PATH + imageName + "_fill.png"} />
+            {/* <img draggable='false' className='die-fill' src={IMG_BASE_PATH + imageName + "_fill.png"} /> */}
+
+            <div
+                className='die-fill'
+                style={maskStyle}
+            />
         </div>
     )
 }
