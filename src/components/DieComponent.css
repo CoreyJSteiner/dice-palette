@@ -245,13 +245,6 @@
     cursor: pointer;
 }
 
-/* Hover effect */
-.dice-group-container.hovering:not(.expanded) {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-/* Expanded state */
 .dice-group-container.expanded {
     width: auto;
     height: auto;
@@ -269,7 +262,6 @@
     display: none;
 }
 
-/* Dice content styling */
 .dice-content {
     display: flex;
     flex-wrap: wrap;
@@ -279,7 +271,6 @@
     transition: all 0.3s ease;
 }
 
-/* Minimize button */
 .minimize-button {
     position: absolute;
     top: 0.5rem;
@@ -298,8 +289,7 @@
 }
 
 .minimize-button:hover {
-    background: rgba(255, 0, 0, 0.8);
-    transform: scale(1.1);
+    transform: scale(1.2);
 }
 
 .minimize-button:active {
