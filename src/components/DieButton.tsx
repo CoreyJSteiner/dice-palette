@@ -9,7 +9,7 @@ type DieButtonProps = {
 const DieButton: React.FC<DieButtonProps> = ({ imageName = 'd20', dieSides = 20, onAddDie }) => {
     return (
         <button className='die-button' onClick={() => onAddDie(dieSides)}>
-            <DieImage imageName={imageName} alt={dieSides.toString()} />
+            <DieImage imageName={imageName} />
         </button>
     )
 }
