@@ -11,7 +11,8 @@ type DiePoolProps = {
     dieClickHandler: (key: string) => void
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
     clearClickHandler: () => void
-    addToGroupHandler: (dieData: Die, groupKey: string | null) => void
+    addToGroupHandler: (dieData: Die, groupKey: string | undefined) => void
+    createGroupHandler: (dice: Array<Die>) => void
 }
 
 const DiePool: React.FC<DiePoolProps> = ({
@@ -20,22 +21,50 @@ const DiePool: React.FC<DiePoolProps> = ({
     clearClickHandler,
     dieClickHandler,
     dieInGroupClickHandler,
-    addToGroupHandler
+    addToGroupHandler,
+    createGroupHandler
 }) => {
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event
 
         const dieData = active.data.current as Die
-        const targetGroup = over?.id ? over.id as string : null
+        const targetData = over ? over.data.current : undefined
 
-        addToGroupHandler(dieData, targetGroup)
+        if (
+            (dieData.groupKey && dieData.groupKey === targetData?.key)
+            || (dieData.key === targetData?.key)
+            || (!dieData.groupKey && !targetData?.key)
+        ) return
+
+        if (targetData instanceof DiceGroup || !targetData) {
+            addToGroupHandler(dieData, targetData?.key)
+        }
+        else if (targetData instanceof Die && dieData.key !== targetData.key) {
+            if (targetData.groupKey) {
+                addToGroupHandler(dieData, targetData.groupKey)
+            } else {
+                createGroupHandler([dieData, targetData])
+            }
+
+        }
     }
 
     return (
+
         <div className="die-pool-container">
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="die-pool">
+                    {/* <div className="dice-groups-container"> */}
+                    {diceGroups.map(diceGroup => (
+                        <DiceGroupDisplay
+                            key={diceGroup.key}
+                            diceGroup={diceGroup}
+                            dieInGroupClickHandler={dieInGroupClickHandler}
+                        />
+                    ))}
+                    {/* </div> */}
+                    {/* <div className="dice-container"> */}
                     {dice.map(die => (
                         <DieDisplay
                             key={die.key}
@@ -43,17 +72,12 @@ const DiePool: React.FC<DiePoolProps> = ({
                             dieClickHandler={dieClickHandler}
                         />
                     ))}
-                    {diceGroups.map(diceGroup => (
-                        <DiceGroupDisplay
-                            key={'1'}
-                            diceGroup={diceGroup}
-                            dieInGroupClickHandler={dieInGroupClickHandler}
-                        />
-                    ))}
+                    {/* </div> */}
                 </div>
+
+                <button className="clear-button" onClick={clearClickHandler}>Clear</button>
             </DndContext>
-            <button className="clear-button" onClick={clearClickHandler}>Clear</button>
-        </div>
+        </div >
     )
 }
 

@@ -9,7 +9,8 @@ type DiceGroupDisplayProps = {
 
 const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGroupClickHandler }) => {
     const { setNodeRef } = useDroppable({
-        id: diceGroup.key
+        id: diceGroup.key,
+        data: diceGroup
     })
 
     const handleDieInGroupClick = (dieKey: string) => {

@@ -1,12 +1,12 @@
 * {
     /* Safari */
-    -webkit-user-select: none;
+    /* -webkit-user-select: none; */
     /* Firefox */
-    -moz-user-select: none;
+    /* -moz-user-select: none; */
     /* IE/Edge */
-    -ms-user-select: none;
+    /* -ms-user-select: none; */
     /* Standard */
-    user-select: none;
+    /* user-select: none; */
 }
 
 .die-pallete {
@@ -115,7 +115,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    user-select: none;
+
 }
 
 .die-img,
@@ -125,7 +125,7 @@
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
-    user-select: none;
+
 }
 
 .die-fill {
@@ -177,9 +177,19 @@
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
     overflow-y: scroll;
     padding: 1rem;
-    user-select: none;
+}
+
+.dice-container,
+.dice-groups-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    overflow-y: scroll;
 }
 
 .die-display {
@@ -187,16 +197,20 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 5rem;
-    height: 5rem;
+    width: 4rem;
+    height: 4rem;
     border: none;
     background: none;
-    user-select: all;
+    z-index: 1;
 }
 
 .die-display:hover {
     border: none;
     background: none;
+}
+
+.die-display:hover .die-img {
+    filter: invert(16%) sepia(99%) saturate(7404%) hue-rotate(4deg) brightness(50%) contrast(118%);
 }
 
 .die-display-value {
@@ -207,11 +221,24 @@
     font-size: 1.75rem;
     padding: 0.1rem;
     text-shadow: -1px -1px 0 red, 1px -1px 0 red, -1px 1px 0 red, 1px 1px 0 red;
-    z-index: 1;
-    user-select: none;
+    z-index: 2;
+
+}
+
+.dice-group-container,
+.die-display {
+    padding: 0;
+    margin: 0.5rem;
 }
 
 .dice-group-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    background: none;
     border: 0.1rem solid black;
     border-radius: 1rem;
+
+    z-index: 0;
 }

@@ -1,4 +1,4 @@
-import { useDraggable } from "@dnd-kit/core"
+import { useDraggable, useDroppable } from "@dnd-kit/core"
 import type Die from "./Die"
 import DieImage from "./DieImage"
 
@@ -8,12 +8,22 @@ type DieDisplayProps = {
 }
 
 const DieDisplay: React.FC<DieDisplayProps> = ({ die, dieClickHandler }) => {
-    const { attributes, listeners, transform, setNodeRef } = useDraggable({
+    const { setNodeRef: setDropRef } = useDroppable({
         id: die.key,
         data: die
     })
 
-    const style = transform ? { transform: `translate:${transform.x}px, ${transform.y}px` } : undefined
+    const { attributes, listeners, transform, setNodeRef: setDragRef } = useDraggable({
+        id: die.key,
+        data: die
+    })
+
+    const setRefs = (node: HTMLElement | null) => {
+        setDragRef(node);
+        setDropRef(node);
+    };
+
+    const style = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined
 
     const handleRightClick = (e: React.MouseEvent) => {
         if (dieClickHandler) {
@@ -24,7 +34,7 @@ const DieDisplay: React.FC<DieDisplayProps> = ({ die, dieClickHandler }) => {
 
     return (
         <button
-            ref={setNodeRef}
+            ref={setRefs}
             {...listeners}
             {...attributes}
             draggable='true'
