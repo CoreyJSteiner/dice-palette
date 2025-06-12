@@ -23,7 +23,7 @@ const DiePallete: React.FC = () => {
 
     const dieRoll = useCallback((die: Die, dieKey: string): Die => {
         if (die.key === dieKey) {
-            const newDie = new Die(die.key, die.dieSides)
+            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
             newDie.roll()
             return newDie
         }
@@ -41,7 +41,10 @@ const DiePallete: React.FC = () => {
         if (diceGroups.filter(diceGroup => diceGroup.dice.length === 1).length > 0) {
             setDice(prevDice => [
                 ...prevDice,
-                ...diceGroups.filter(diceGroup => diceGroup.dice.length === 1).map(diceGroup => diceGroup.dice[0])
+                ...diceGroups.filter(diceGroup => diceGroup.dice.length === 1).map(diceGroup => {
+                    const { key, dieSides, dieValue } = diceGroup.dice[0]
+                    return new Die(key, dieSides, dieValue, null)
+                })
             ])
             setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.dice.length > 1))
         }
@@ -93,7 +96,7 @@ const DiePallete: React.FC = () => {
             }).filter(group => group.dice.length > 0))
             setDice(prevDice => [
                 ...prevDice,
-                new Die(dieData.key, dieData.dieSides, dieData.dieValue, undefined)
+                new Die(dieData.key, dieData.dieSides, dieData.dieValue, null)
             ])
         }
     }
@@ -142,14 +145,14 @@ const DiePallete: React.FC = () => {
 
     const handleRollAll = () => {
         setDice(prevDice => prevDice.map(die => {
-            const newDie = new Die(die.key, die.dieSides);
+            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey);
             newDie.roll();
             return newDie;
         }));
 
         setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
             const newDice = diceGroup.dice.map(die => {
-                const newDie = new Die(die.key, die.dieSides)
+                const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
                 newDie.roll()
                 return newDie
             })

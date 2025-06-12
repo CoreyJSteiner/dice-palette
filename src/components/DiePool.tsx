@@ -34,10 +34,11 @@ const DiePool: React.FC<DiePoolProps> = ({
         if (
             (dieData.groupKey && dieData.groupKey === targetData?.key)
             || (dieData.key === targetData?.key)
-            || (!dieData.groupKey && !targetData?.key)
+            || (dieData.groupKey && dieData.groupKey === targetData?.groupKey)
         ) return
 
         if (targetData instanceof DiceGroup || !targetData) {
+            console.log(`owawawa:${JSON.stringify(dieData)}+${targetData}`)
             addToGroupHandler(dieData, targetData?.key)
         }
         else if (targetData instanceof Die && dieData.key !== targetData.key) {
