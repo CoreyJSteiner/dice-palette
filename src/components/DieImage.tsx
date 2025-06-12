@@ -5,7 +5,7 @@ type DieImageProps = {
     fillColor?: string
 }
 
-const IMG_BASE_PATH = '../../'
+const IMG_BASE_PATH = 'assets/'
 
 const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20', fillColor = 'red' }) => {
     const styleFill: CSSProperties = {
@@ -20,8 +20,6 @@ const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20', fillColor = 'red
     return (
         <div className='die-img-container' style={styleFill}>
             <img draggable='false' className='die-img' src={IMG_BASE_PATH + imageName + '.png'} />
-            {/* <img draggable='false' className='die-fill' src={IMG_BASE_PATH + imageName + "_fill.png"} /> */}
-
             <div
                 className='die-fill'
                 style={maskStyle}
