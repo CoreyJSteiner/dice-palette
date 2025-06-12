@@ -5,7 +5,7 @@ function App() {
 
   return (
     <>
-      <div>
+      <div className='app-container'>
         <DiePallete />
       </div>
     </>
