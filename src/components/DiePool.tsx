@@ -45,8 +45,10 @@ const DiePool: React.FC<DiePoolProps> = ({
         else if (targetData instanceof Die && dieData.key !== targetData.key) {
             if (targetData.groupKey) {
                 addToGroupHandler(dieData, targetData.groupKey)
-            } else {
+            } else if (!dieData.groupKey) {
                 createGroupHandler([dieData, targetData])
+            } else {
+                addToGroupHandler(dieData, undefined)
             }
 
         }

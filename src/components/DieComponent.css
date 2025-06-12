@@ -87,6 +87,12 @@
     z-index: 99;
 }
 
+@media screen and (max-width: 900px) {
+    .clear-button {
+        font-size: 1.5rem;
+    }
+}
+
 .clear-button:hover {
     background-color: var(--die-pool-background-color);
     transform: scale(108%);
