@@ -259,7 +259,6 @@
     min-height: 10rem;
     max-width: 25rem;
     max-height: 25rem;
-    z-index: 5;
     background: grey;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     overflow: visible;
@@ -275,6 +274,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
+    align-items: center;
     gap: 0.5rem;
     transition: all 0.3s ease;
 }

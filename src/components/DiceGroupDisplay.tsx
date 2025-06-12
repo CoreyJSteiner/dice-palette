@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useDroppable } from "@dnd-kit/core"
 import DiceGroup from "./DiceGroup"
 import DieDisplay from "./DieDisplay"
