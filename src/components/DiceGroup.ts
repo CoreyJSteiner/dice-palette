@@ -8,6 +8,11 @@ class DiceGroup {
         this.key = key
         this.dice = dice
     }
+
+    sum() {
+        const diceValues = this.dice.map(die => die.dieValue ? die.dieValue : 0)
+        return diceValues.reduce((sum, dieValue) => sum + dieValue)
+    }
 }
 
 export default DiceGroup

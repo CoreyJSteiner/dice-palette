@@ -110,37 +110,37 @@
     filter: brightness(110%);
 }
 
-/* .die-img-container {
+.die-img-container {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    --fill-color: blue;
+    --value-font-color: rgb(255, 247, 0);
+}
 
-} */
-
-/* .die-img,
-.die-fill {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-
-} */
-
-/* .die-fill {
+.die-img {
     position: absolute;
-    z-index: 0;
-    width: 95%;
-    height: 95%;
-    filter: invert(16%) sepia(99%) saturate(7404%) hue-rotate(4deg) brightness(95%) contrast(118%);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
 
-} */
-
-/* .die-img {
-    position: relative;
+.die-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--fill-color);
+    mask-size: 100% 100%;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
     z-index: 1;
-} */
+}
 
 @keyframes shudder {
     0% {
@@ -182,16 +182,6 @@
     overflow-x: hidden;
     overflow-y: scroll;
     padding: 1rem;
-}
-
-.dice-container,
-.dice-groups-container {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    overflow-y: scroll;
 }
 
 .die-display {
@@ -237,48 +227,81 @@
     z-index: 2;
 }
 
+/* Updated dice group container */
 .dice-group-container {
+    position: relative;
     display: flex;
     flex-direction: row;
+    justify-content: space-around;
     flex-wrap: wrap;
-
-    background: none;
+    background: grey;
     border: 0.1rem solid black;
     border-radius: 1rem;
-
     z-index: 0;
+    width: 4rem;
+    height: 4rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-
-/* test */
-.die-img-container {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    --fill-color: blue;
-    --value-font-color: rgb(255, 247, 0);
+/* Hover effect */
+.dice-group-container.hovering:not(.expanded) {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-.die-img {
+/* Expanded state */
+.dice-group-container.expanded {
+    width: auto;
+    height: auto;
+    min-width: 15rem;
+    min-height: 10rem;
+    max-width: 25rem;
+    max-height: 25rem;
+    z-index: 5;
+    background: grey;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    overflow: visible;
+    padding: 0.5rem;
+}
+
+.dice-group-container.expanded::before {
+    display: none;
+}
+
+/* Dice content styling */
+.dice-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+/* Minimize button */
+.minimize-button {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(255, 255, 255, 0.8);
+    border: none;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
-.die-fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--fill-color);
-    mask-size: 100% 100%;
-    mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 100%;
-    -webkit-mask-repeat: no-repeat;
-    z-index: 1;
+.minimize-button:hover {
+    background: rgba(255, 0, 0, 0.8);
+    transform: scale(1.1);
+}
+
+.minimize-button:active {
+    transform: scale(0.9);
 }

@@ -16,6 +16,7 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
     fillColor = 'magenta',
     valueFontColor = 'yellow'
 }) => {
+
     const { setNodeRef: setDropRef } = useDroppable({
         id: die.key,
         data: die
