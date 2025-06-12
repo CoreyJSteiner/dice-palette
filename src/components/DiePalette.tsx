@@ -12,31 +12,7 @@ const DiePallete: React.FC = () => {
     const [dice, setDice] = useState<DieArray>([])
     const [diceGroups, setDiceGroups] = useState<DiceGroups>([])
 
-    const handleClearDice = () => {
-        setDice([])
-        setDiceGroups([])
-    }
-
-    const handleNewDie = (dieSides: number) => {
-        setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
-    }
-
-    const dieRoll = useCallback((die: Die, dieKey: string): Die => {
-        if (die.key === dieKey) {
-            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
-            newDie.roll()
-            return newDie
-        }
-
-        return die
-    }, [])
-
-    const handleDieClick = (dieKey: string) => {
-        setDice(prevDice => prevDice.map(die => {
-            return dieRoll(die, dieKey)
-        }))
-    }
-
+    // Effects
     useEffect(() => {
         if (diceGroups.filter(diceGroup => diceGroup.dice.length === 1).length > 0) {
             setDice(prevDice => [
@@ -50,9 +26,32 @@ const DiePallete: React.FC = () => {
         }
     }, [diceGroups])
 
-    // const removeGroup = (groupKey: string) => {
-    //     setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey))
-    // }
+    // Callbacks
+    const dieRoll = useCallback((die: Die, dieKey: string): Die => {
+        if (die.key === dieKey) {
+            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
+            newDie.roll()
+            return newDie
+        }
+
+        return die
+    }, [])
+
+    // Handlers
+    const handleClearDice = () => {
+        setDice([])
+        setDiceGroups([])
+    }
+
+    const handleNewDie = (dieSides: number) => {
+        setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
+    }
+
+    const handleDieClick = (dieKey: string) => {
+        setDice(prevDice => prevDice.map(die => {
+            return dieRoll(die, dieKey)
+        }))
+    }
 
     const handleAddDieToGroup = (dieData: Die, targetGroupKey: string | undefined) => {
         if (targetGroupKey) {
@@ -140,15 +139,15 @@ const DiePallete: React.FC = () => {
 
         setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
             return diceGroupReplace(diceGroup)
-        }));
+        }))
     }
 
     const handleRollAll = () => {
         setDice(prevDice => prevDice.map(die => {
-            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey);
-            newDie.roll();
-            return newDie;
-        }));
+            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
+            newDie.roll()
+            return newDie
+        }))
 
         setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
             const newDice = diceGroup.dice.map(die => {
@@ -158,7 +157,7 @@ const DiePallete: React.FC = () => {
             })
 
             return new DiceGroup(diceGroup.key, newDice)
-        }));
+        }))
     }
 
     return (

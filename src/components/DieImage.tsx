@@ -8,10 +8,13 @@ type DieImageProps = {
 const IMG_BASE_PATH = 'assets/'
 
 const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20', fillColor = 'red' }) => {
+
+    // CSS - Vars
     const styleFill: CSSProperties = {
         '--fill-color': fillColor,
     } as CSSProperties
 
+    // CSS - Fill Mask
     const maskStyle: CSSProperties = {
         maskImage: `url(${IMG_BASE_PATH}${imageName}_fill.png)`,
         WebkitMaskImage: `url(${IMG_BASE_PATH}${imageName}_fill.png)`,

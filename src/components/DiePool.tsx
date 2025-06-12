@@ -25,6 +25,7 @@ const DiePool: React.FC<DiePoolProps> = ({
     createGroupHandler
 }) => {
 
+    // Handlers
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event
 
@@ -52,11 +53,9 @@ const DiePool: React.FC<DiePoolProps> = ({
     }
 
     return (
-
         <div className="die-pool-container">
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="die-pool">
-                    {/* <div className="dice-groups-container"> */}
                     {diceGroups.map(diceGroup => (
                         <DiceGroupDisplay
                             key={diceGroup.key}
@@ -64,8 +63,6 @@ const DiePool: React.FC<DiePoolProps> = ({
                             dieInGroupClickHandler={dieInGroupClickHandler}
                         />
                     ))}
-                    {/* </div> */}
-                    {/* <div className="dice-container"> */}
                     {dice.map(die => (
                         <DieDisplay
                             key={die.key}
@@ -73,7 +70,6 @@ const DiePool: React.FC<DiePoolProps> = ({
                             dieClickHandler={dieClickHandler}
                         />
                     ))}
-                    {/* </div> */}
                 </div>
 
                 <button className="clear-button" onClick={clearClickHandler}>Clear</button>

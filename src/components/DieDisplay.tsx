@@ -17,6 +17,15 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
     valueFontColor = 'yellow'
 }) => {
 
+    // Handlers
+    const handleRightClick = (e: React.MouseEvent) => {
+        if (dieClickHandler) {
+            e.preventDefault()
+            dieClickHandler(die.key)
+        }
+    }
+
+    // Drag Ref
     const { setNodeRef: setDropRef } = useDroppable({
         id: die.key,
         data: die
@@ -26,25 +35,21 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
         id: die.key,
         data: die
     })
-
     const setRefs = (node: HTMLElement | null) => {
-        setDragRef(node);
-        setDropRef(node);
-    };
+        setDragRef(node)
+        setDropRef(node)
+    }
 
+    // CSS - Transform styles
     const styleTransform = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined
 
+
+    // CSS - Vars
     const styleValueFont: CSSProperties = {
         '--value-font-color': valueFontColor,
         '--value-font-border-color': fillColor,
     } as CSSProperties
 
-    const handleRightClick = (e: React.MouseEvent) => {
-        if (dieClickHandler) {
-            e.preventDefault()
-            dieClickHandler(die.key)
-        }
-    }
 
     return (
         <button
