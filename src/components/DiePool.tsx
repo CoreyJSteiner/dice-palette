@@ -15,18 +15,20 @@ type DiePoolProps = {
     addToGroupHandler: (dieData: Die, groupKey: string | undefined) => void
     createGroupHandler: (dice: Array<Die>) => void
     destroyGroupHandler: (groupKey: string) => void
+    rollDiceGroupHandler: (groupKey: string) => void
 }
 
 const DiePool: React.FC<DiePoolProps> = ({
     dice = [],
     diceGroups = [],
     clearClickHandler,
+    resetClickHandler,
     dieClickHandler,
     dieInGroupClickHandler,
     addToGroupHandler,
     createGroupHandler,
     destroyGroupHandler,
-    resetClickHandler
+    rollDiceGroupHandler
 }) => {
 
     // Handlers
@@ -67,6 +69,7 @@ const DiePool: React.FC<DiePoolProps> = ({
                             diceGroup={diceGroup}
                             dieInGroupClickHandler={dieInGroupClickHandler}
                             destroyGroupHandler={destroyGroupHandler}
+                            rollDiceGroupHandler={rollDiceGroupHandler}
                         />
                     ))}
                     {dice.map(die => (

@@ -7,9 +7,15 @@ type DiceGroupDisplayProps = {
     diceGroup: DiceGroup
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
     destroyGroupHandler: (groupKey: string) => void
+    rollDiceGroupHandler: (groupKey: string) => void
 }
 
-const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGroupClickHandler, destroyGroupHandler }) => {
+const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
+    diceGroup,
+    dieInGroupClickHandler,
+    destroyGroupHandler,
+    rollDiceGroupHandler
+}) => {
     const [isExpanded, setIsExpanded] = useState(false)
     const [isHovering, setIsHovering] = useState(false)
     const [displayState, setDisplayState] = useState('+')
@@ -71,10 +77,8 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGro
 
     const handleRightClickOnCollapse = (e: React.MouseEvent) => {
         e.preventDefault()
-        // destroyGroupHandler(diceGroup.key)
+        rollDiceGroupHandler(diceGroup.key)
     }
-
-
 
     // Drag Ref
     const { setNodeRef } = useDroppable({

@@ -27,15 +27,19 @@ const DiePallete: React.FC = () => {
     }, [diceGroups])
 
     // Callbacks
-    const dieRoll = useCallback((die: Die, dieKey: string): Die => {
+    const rollDie = useCallback((die: Die): Die => {
+        const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
+        newDie.roll()
+        return newDie
+    }, [])
+
+    const rollDieById = useCallback((die: Die, dieKey: string): Die => {
         if (die.key === dieKey) {
-            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
-            newDie.roll()
-            return newDie
+            return rollDie(die)
         }
 
         return die
-    }, [])
+    }, [rollDie])
 
     // Handlers
     const handleClearDice = () => {
@@ -59,7 +63,7 @@ const DiePallete: React.FC = () => {
 
     const handleDieClick = (dieKey: string) => {
         setDice(prevDice => prevDice.map(die => {
-            return dieRoll(die, dieKey)
+            return rollDieById(die, dieKey)
         }))
     }
 
@@ -72,6 +76,16 @@ const DiePallete: React.FC = () => {
             })
         ])
         setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey))
+    }
+
+    const handleRollDiceGroup = (groupKey: string) => {
+        setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
+            if (diceGroup.key === groupKey) {
+                return new DiceGroup(diceGroup.key, diceGroup.dice.map(die => rollDie(die)))
+            }
+
+            return diceGroup
+        }))
     }
 
     const handleAddDieToGroup = (dieData: Die, targetGroupKey: string | undefined) => {
@@ -150,7 +164,7 @@ const DiePallete: React.FC = () => {
         const diceGroupReplace = (diceGroup: DiceGroup): DiceGroup => {
             if (diceGroup.key === groupKey) {
                 const newDice = diceGroup.dice.map(die => {
-                    return dieRoll(die, dieKey)
+                    return rollDieById(die, dieKey)
                 })
 
                 return new DiceGroup(diceGroup.key, newDice)
@@ -194,6 +208,7 @@ const DiePallete: React.FC = () => {
                 addToGroupHandler={handleAddDieToGroup}
                 createGroupHandler={handleCreateGroup}
                 destroyGroupHandler={handleDestroyGroup}
+                rollDiceGroupHandler={handleRollDiceGroup}
             />
             <button className='die-pallete-roll-all' onClick={handleRollAll}>Roll All</button>
         </div>
