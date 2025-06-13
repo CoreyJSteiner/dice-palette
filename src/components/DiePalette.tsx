@@ -11,9 +11,35 @@ type DiceGroups = Array<DiceGroup>
 const DiePallete: React.FC = () => {
     const [dice, setDice] = useState<DieArray>([])
     const [diceGroups, setDiceGroups] = useState<DiceGroups>([])
+    const [heldKeys, setHeldKeys] = useState<Set<string>>(new Set())
 
     // Effects
     useEffect(() => {
+        const handleKeyboardDownEvent = (e: KeyboardEvent) => {
+            if (!e.repeat) {
+                setHeldKeys(prevHeldKeys => new Set([...prevHeldKeys, e.code]))
+            }
+        }
+
+        const handleKeyboardUpEvent = (e: KeyboardEvent) => {
+            setHeldKeys(prevHeldKeys => {
+                const newSet = new Set(prevHeldKeys)
+                newSet.delete(e.code)
+                return newSet
+            });
+        }
+
+        window.addEventListener('keydown', handleKeyboardDownEvent)
+        window.addEventListener('keyup', handleKeyboardUpEvent)
+
+        return () => {
+            window.removeEventListener('keydown', handleKeyboardDownEvent)
+            window.removeEventListener('keyup', handleKeyboardUpEvent)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (heldKeys.has('Space')) return
         if (diceGroups.filter(diceGroup => diceGroup.dice.length === 1).length > 0) {
             setDice(prevDice => [
                 ...prevDice,
@@ -24,7 +50,7 @@ const DiePallete: React.FC = () => {
             ])
             setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.dice.length > 1))
         }
-    }, [diceGroups])
+    }, [diceGroups, heldKeys])
 
     // Callbacks
     const rollDie = useCallback((die: Die): Die => {
@@ -42,6 +68,21 @@ const DiePallete: React.FC = () => {
     }, [rollDie])
 
     // Handlers
+    const handleNewDie = (dieSides: number, groupKey: string | null | undefined) => {
+        if (groupKey) {
+            console.log(groupKey)
+            const newDie = new Die(crypto.randomUUID(), dieSides, undefined, groupKey)
+            const existingDiceGroup = diceGroups.find(diceGroup => diceGroup.key === groupKey)
+            const existingDice = existingDiceGroup ? existingDiceGroup.dice : []
+            setDiceGroups(prevDiceGroups => [
+                ...prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey),
+                new DiceGroup(groupKey, [...existingDice, newDie])
+            ])
+        } else {
+            setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
+        }
+    }
+
     const handleClearDice = () => {
         setDice([])
         setDiceGroups([])
@@ -55,10 +96,6 @@ const DiePallete: React.FC = () => {
             return new DiceGroup(diceGroup.key, diceGroup.dice.map(die => removeDieValue(die)))
         }))
 
-    }
-
-    const handleNewDie = (dieSides: number) => {
-        setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
     }
 
     const handleDieClick = (dieKey: string) => {

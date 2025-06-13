@@ -42,7 +42,6 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
 
         const handleKeyboardEvent = (e: KeyboardEvent) => {
             if (!isHovering) return
-            console.log(e.code)
             e.preventDefault()
             if (e.code === 'Space') handleDisplayStateCycle()
             if (e.code === 'Backspace' || e.code === 'Delete') destroyGroupHandler(diceGroup.key)

@@ -2,7 +2,7 @@ import type React from "react"
 import DieButton from "./DieButton"
 
 type DieOptionsProps = {
-    onAddDie: (dieSides: number) => void
+    onAddDie: (dieSides: number, groupKey: string | null | undefined) => void
 }
 
 const DieOptions: React.FC<DieOptionsProps> = ({ onAddDie }) => {
