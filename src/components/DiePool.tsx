@@ -11,6 +11,7 @@ type DiePoolProps = {
     dieClickHandler: (key: string) => void
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
     clearClickHandler: () => void
+    resetClickHandler: () => void
     addToGroupHandler: (dieData: Die, groupKey: string | undefined) => void
     createGroupHandler: (dice: Array<Die>) => void
     destroyGroupHandler: (groupKey: string) => void
@@ -24,7 +25,8 @@ const DiePool: React.FC<DiePoolProps> = ({
     dieInGroupClickHandler,
     addToGroupHandler,
     createGroupHandler,
-    destroyGroupHandler
+    destroyGroupHandler,
+    resetClickHandler
 }) => {
 
     // Handlers
@@ -77,7 +79,10 @@ const DiePool: React.FC<DiePoolProps> = ({
                     ))}
                 </div>
 
-                <button className="clear-button" onClick={clearClickHandler}>Clear</button>
+                <div className="button-bottom-container">
+                    <button className="button-bottom" onClick={resetClickHandler}>Reset Dice</button>
+                    <button className="button-bottom" onClick={clearClickHandler}>Clear Palette</button>
+                </div>
             </DndContext>
         </div >
     )

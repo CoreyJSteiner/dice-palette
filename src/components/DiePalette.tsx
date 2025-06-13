@@ -43,6 +43,16 @@ const DiePallete: React.FC = () => {
         setDiceGroups([])
     }
 
+    const handleResetDice = () => {
+        const removeDieValue = (die: Die) => new Die(die.key, die.dieSides, undefined, die.groupKey)
+
+        setDice(prevDice => prevDice.map(die => removeDieValue(die)))
+        setDiceGroups(prevDiceGroup => prevDiceGroup.map(diceGroup => {
+            return new DiceGroup(diceGroup.key, diceGroup.dice.map(die => removeDieValue(die)))
+        }))
+
+    }
+
     const handleNewDie = (dieSides: number) => {
         setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
     }
@@ -178,6 +188,7 @@ const DiePallete: React.FC = () => {
                 dice={dice}
                 diceGroups={diceGroups}
                 clearClickHandler={handleClearDice}
+                resetClickHandler={handleResetDice}
                 dieClickHandler={handleDieClick}
                 dieInGroupClickHandler={handleDieInGroupClick}
                 addToGroupHandler={handleAddDieToGroup}

@@ -77,10 +77,13 @@
     border-radius: 0rem 0rem 1rem 1rem;
 }
 
-.clear-button {
+.button-bottom-container {
     position: absolute;
     bottom: 1rem;
     right: 1rem;
+}
+
+.button-bottom {
     background: var(--die-pool-background-color);
     border: none;
     transition: transform 0.2s ease-in-out;
@@ -88,17 +91,17 @@
 }
 
 @media screen and (max-width: 900px) {
-    .clear-button {
+    .button-bottom {
         font-size: 1.5rem;
     }
 }
 
-.clear-button:hover {
+.button-bottom:hover {
     background-color: var(--die-pool-background-color);
     transform: scale(108%);
 }
 
-.clear-button:active {
+.button-bottom:active {
     background-color: var(--die-pool-background-color);
     transform: scale(90%);
 }
