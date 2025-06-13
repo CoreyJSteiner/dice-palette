@@ -53,6 +53,17 @@ const DiePallete: React.FC = () => {
         }))
     }
 
+    const handleDestroyGroup = (groupKey: string) => {
+        const dice: Array<Die> = diceGroups.filter(diceGroup => diceGroup.key === groupKey)[0].dice
+        setDice(prevDice => [
+            ...prevDice,
+            ...dice.map(die => {
+                return new Die(die.key, die.dieSides, die.dieValue, undefined)
+            })
+        ])
+        setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey))
+    }
+
     const handleAddDieToGroup = (dieData: Die, targetGroupKey: string | undefined) => {
         if (targetGroupKey) {
             setDice(prevDice => prevDice.filter(die => die.key !== dieData.key))
@@ -171,6 +182,7 @@ const DiePallete: React.FC = () => {
                 dieInGroupClickHandler={handleDieInGroupClick}
                 addToGroupHandler={handleAddDieToGroup}
                 createGroupHandler={handleCreateGroup}
+                destroyGroupHandler={handleDestroyGroup}
             />
             <button className='die-pallete-roll-all' onClick={handleRollAll}>Roll All</button>
         </div>

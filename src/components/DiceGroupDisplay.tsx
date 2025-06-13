@@ -6,9 +6,10 @@ import DieDisplay from "./DieDisplay"
 type DiceGroupDisplayProps = {
     diceGroup: DiceGroup
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
+    destroyGroupHandler: (groupKey: string) => void
 }
 
-const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGroupClickHandler }) => {
+const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGroupClickHandler, destroyGroupHandler }) => {
     const [isExpanded, setIsExpanded] = useState(false)
     const [isHovering, setIsHovering] = useState(false)
     const containerRef = useRef<HTMLDivElement>(null)
@@ -34,6 +35,11 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGro
     const handleMinimizeClick = (e: React.MouseEvent) => {
         e.stopPropagation()
         setIsExpanded(false)
+    }
+
+    const handleRightClickOnCollapse = (e: React.MouseEvent) => {
+        e.preventDefault()
+        destroyGroupHandler(diceGroup.key)
     }
 
     // Drag Ref
@@ -86,7 +92,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGro
             )}
 
             {!isExpanded && (
-                <div className="dice-group-collapse-cover" >
+                <div className="dice-group-collapse-cover" onContextMenu={handleRightClickOnCollapse}>
                     <h1 className='dice-group-collapse-sum'>{diceGroup.sum()}</h1>
                 </div>
             )}
