@@ -12,9 +12,40 @@ type DiceGroupDisplayProps = {
 const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGroupClickHandler, destroyGroupHandler }) => {
     const [isExpanded, setIsExpanded] = useState(false)
     const [isHovering, setIsHovering] = useState(false)
+    const [displayState, setDisplayState] = useState('+')
     const containerRef = useRef<HTMLDivElement>(null)
 
     // Effects
+    useEffect(() => {
+        const handleDisplayStateCycle = () => {
+            switch (displayState) {
+                case '+':
+                    setDisplayState('kh')
+                    break;
+                case 'kh':
+                    setDisplayState('kl')
+                    break;
+                case 'kl':
+                    setDisplayState('+')
+                    break;
+                default:
+                    setDisplayState('+')
+                    break;
+            }
+        }
+
+        const handleKeyboardEvent = (e: KeyboardEvent) => {
+            if (!isHovering) return
+            console.log(e.code)
+            e.preventDefault()
+            if (e.code === 'Space') handleDisplayStateCycle()
+            if (e.code === 'Backspace' || e.code === 'Delete') destroyGroupHandler(diceGroup.key)
+        }
+
+        window.addEventListener('keydown', handleKeyboardEvent)
+        return () => window.removeEventListener('keydown', handleKeyboardEvent)
+    }, [isHovering, displayState, destroyGroupHandler, diceGroup])
+
     useEffect(() => {
         if (!isExpanded) {
             setIsHovering(false)
@@ -29,6 +60,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGro
     const handleContainerClick = () => {
         if (!isExpanded) {
             setIsExpanded(true)
+            setIsHovering(false)
         }
     }
 
@@ -39,8 +71,10 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGro
 
     const handleRightClickOnCollapse = (e: React.MouseEvent) => {
         e.preventDefault()
-        destroyGroupHandler(diceGroup.key)
+        // destroyGroupHandler(diceGroup.key)
     }
+
+
 
     // Drag Ref
     const { setNodeRef } = useDroppable({
@@ -81,25 +115,30 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGro
         >
             {isExpanded && (
                 <div>
-                    <h1 className='dice-group-expand-sum'>{diceGroup.sum()}</h1>
+                    <h1 className='dice-group-expand-display'>{diceGroup.display(displayState)}</h1>
                     <button
                         className="minimize-button"
                         onClick={handleMinimizeClick}
                     >
-                        <span style={{ fontSize: '1.2rem', color: 'white' }}>−</span>
+                        <span className='material-symbols-outlined dice-group-close'>close</span>
                     </button>
                 </div>
             )}
 
             {!isExpanded && (
-                <div className="dice-group-collapse-cover" onContextMenu={handleRightClickOnCollapse}>
-                    <h1 className='dice-group-collapse-sum'>{diceGroup.sum()}</h1>
+                <div
+                    className="dice-group-collapse-cover"
+                    onContextMenu={handleRightClickOnCollapse}
+                >
+                    <h1 className='dice-group-collapse-display'>{diceGroup.display(displayState)}</h1>
+                    <p className='dice-group-collapse-display-state'>{displayState}</p>
                 </div>
-            )}
+            )
+            }
 
             <div className="dice-content" style={styleDiceContentTransform}>
                 {diceGroup.dice.map(die => (
-                    <div style={styleDieDisplayTransform}>
+                    <div key={die.key} style={styleDieDisplayTransform} >
                         <DieDisplay
                             key={die.key}
                             die={die}
@@ -109,7 +148,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({ diceGroup, dieInGro
                     </div>
                 ))}
             </div>
-        </div>
+        </div >
     )
 }
 

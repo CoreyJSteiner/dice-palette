@@ -43,7 +43,6 @@ const DiePool: React.FC<DiePoolProps> = ({
         ) return
 
         if (targetData instanceof DiceGroup || !targetData) {
-            console.log(`owawawa:${JSON.stringify(dieData)}+${targetData}`)
             addToGroupHandler(dieData, targetData?.key)
         }
         else if (targetData instanceof Die && dieData.key !== targetData.key) {
