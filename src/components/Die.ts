@@ -2,9 +2,14 @@ class Die {
     key: string
     dieSides: number
     dieValue?: number
-    groupKey: string | undefined | null
+    groupKey?: string | null
 
-    constructor(key: string, dieSides: number, dieValue?: number, groupKey?: string | undefined | null) {
+    constructor(
+        key: string,
+        dieSides: number,
+        dieValue?: number,
+        groupKey?: string | null,
+    ) {
         this.key = key
         this.dieSides = dieSides
         this.dieValue = dieValue

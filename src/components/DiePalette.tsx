@@ -11,7 +11,6 @@ type DiceGroups = Array<DiceGroup>
 const DiePallete: React.FC = () => {
     const [dice, setDice] = useState<DieArray>([])
     const [diceGroups, setDiceGroups] = useState<DiceGroups>([])
-    // const [heldKeys, setHeldKeys] = useState<Set<string>>(new Set())
     const heldKeysRef = useRef<Set<string>>(new Set())
 
     // Effects
