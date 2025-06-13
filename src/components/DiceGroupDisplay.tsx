@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useDroppable } from "@dnd-kit/core"
 import DiceGroup from "./DiceGroup"
 import DieDisplay from "./DieDisplay"
@@ -23,37 +23,15 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
 
     // Effects
     useEffect(() => {
-        const handleDisplayStateCycle = () => {
-            switch (displayState) {
-                case '+':
-                    setDisplayState('kh')
-                    break;
-                case 'kh':
-                    setDisplayState('kl')
-                    break;
-                case 'kl':
-                    setDisplayState('+')
-                    break;
-                default:
-                    setDisplayState('+')
-                    break;
-            }
+        if (isHovering && containerRef.current && !isExpanded) {
+            containerRef.current.focus()
         }
-
-        const handleKeyboardEvent = (e: KeyboardEvent) => {
-            if (!isHovering) return
-            e.preventDefault()
-            if (e.code === 'Space') handleDisplayStateCycle()
-            if (e.code === 'Backspace' || e.code === 'Delete') destroyGroupHandler(diceGroup.key)
-        }
-
-        window.addEventListener('keydown', handleKeyboardEvent)
-        return () => window.removeEventListener('keydown', handleKeyboardEvent)
-    }, [isHovering, displayState, destroyGroupHandler, diceGroup])
+    }, [isHovering, isExpanded])
 
     useEffect(() => {
         if (!isExpanded) {
             setIsHovering(false)
+            containerRef.current?.focus()
         }
     }, [isExpanded])
 
@@ -77,6 +55,29 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     const handleRightClickOnCollapse = (e: React.MouseEvent) => {
         e.preventDefault()
         rollDiceGroupHandler(diceGroup.key)
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.repeat) return
+        const handleSpaceDown = () => {
+            e.preventDefault()
+            setDisplayState(prev => {
+                switch (prev) {
+                    case '+': return 'kh'
+                    case 'kh': return 'kl'
+                    case 'kl': return '+'
+                    default: return '+'
+                }
+            })
+        }
+
+        const handleDelete = () => {
+            e.preventDefault()
+            destroyGroupHandler(diceGroup.key)
+        }
+
+        if (e.code === 'Space') handleSpaceDown()
+        if (e.code === 'Backspace' || e.code === 'Delete') handleDelete()
     }
 
     // Drag Ref
@@ -110,10 +111,12 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     return (
         <div
             ref={combinedRef}
+            tabIndex={0}
             className={`dice-group-container ${isExpanded ? 'expanded' : ''}`}
             onClick={handleContainerClick}
             onMouseEnter={() => !isExpanded && setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
+            onKeyDown={handleKeyDown}
             style={styleDieGroupTransform}
         >
             {isExpanded && (

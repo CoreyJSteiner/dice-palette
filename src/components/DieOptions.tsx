@@ -1,47 +1,49 @@
 import type React from "react"
 import DieButton from "./DieButton"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 type DieOptionsProps = {
     onAddDie: (dieSides: number, groupKey: string | null | undefined) => void
 }
 
 const DieOptions: React.FC<DieOptionsProps> = ({ onAddDie }) => {
+    const [isHovering, setIsHovering] = useState(false)
     const [addGroup, setAddGroup] = useState<string | null | undefined>(null)
+    const containerRef = useRef<HTMLDivElement>(null)
 
     // Effects
     useEffect(() => {
-        const handleKeyboardDownEvent = (e: KeyboardEvent) => {
-            const handleGroupAdd = () => {
-                if (addGroup) return
-                setAddGroup(crypto.randomUUID())
-            }
+        if (isHovering && containerRef.current) {
+            containerRef.current.focus()
+        }
+    }, [isHovering])
 
+
+    // Handlers
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.repeat) return
+        if (e.code === 'Space') {
             e.preventDefault()
-            if (e.code === 'Space') handleGroupAdd()
+            setAddGroup(prev => prev || crypto.randomUUID())
         }
+    }
 
-        const handleKeyboardUpEvent = (e: KeyboardEvent) => {
-            const handleClearAddGroup = () => {
-                setAddGroup(null)
-            }
-
-            console.log(e.code)
+    const handleKeyUp = (e: React.KeyboardEvent) => {
+        if (e.code === 'Space') {
             e.preventDefault()
-            if (e.code === 'Space') handleClearAddGroup()
+            setAddGroup(null)
         }
-
-        window.addEventListener('keydown', handleKeyboardDownEvent)
-        window.addEventListener('keyup', handleKeyboardUpEvent)
-        return () => {
-            window.removeEventListener('keydown', handleKeyboardDownEvent)
-            window.removeEventListener('keyup', handleKeyboardUpEvent)
-        }
-    }, [addGroup])
+    }
 
     return (
         <div
+            ref={containerRef}
+            tabIndex={0}
             className="die-options"
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+            onKeyDown={handleKeyDown}
+            onKeyUp={handleKeyUp}
         >
             <DieButton imageName="d4" dieSides={4} onAddDie={onAddDie} addGroup={addGroup} />
             <DieButton imageName="d6" dieSides={6} onAddDie={onAddDie} addGroup={addGroup} />

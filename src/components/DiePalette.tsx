@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useRef } from 'react'
 import './DieComponent.css'
 import DieOptions from "./DieOptions"
 import DiePool from "./DiePool"
@@ -11,35 +11,30 @@ type DiceGroups = Array<DiceGroup>
 const DiePallete: React.FC = () => {
     const [dice, setDice] = useState<DieArray>([])
     const [diceGroups, setDiceGroups] = useState<DiceGroups>([])
-    const [heldKeys, setHeldKeys] = useState<Set<string>>(new Set())
+    // const [heldKeys, setHeldKeys] = useState<Set<string>>(new Set())
+    const heldKeysRef = useRef<Set<string>>(new Set())
 
     // Effects
     useEffect(() => {
-        const handleKeyboardDownEvent = (e: KeyboardEvent) => {
-            if (!e.repeat) {
-                setHeldKeys(prevHeldKeys => new Set([...prevHeldKeys, e.code]))
-            }
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (!e.repeat) heldKeysRef.current.add(e.code)
         }
 
-        const handleKeyboardUpEvent = (e: KeyboardEvent) => {
-            setHeldKeys(prevHeldKeys => {
-                const newSet = new Set(prevHeldKeys)
-                newSet.delete(e.code)
-                return newSet
-            });
+        const handleKeyUp = (e: KeyboardEvent) => {
+            heldKeysRef.current.delete(e.code);
         }
 
-        window.addEventListener('keydown', handleKeyboardDownEvent)
-        window.addEventListener('keyup', handleKeyboardUpEvent)
-
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
         return () => {
-            window.removeEventListener('keydown', handleKeyboardDownEvent)
-            window.removeEventListener('keyup', handleKeyboardUpEvent)
-        }
-    }, [])
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
+
 
     useEffect(() => {
-        if (heldKeys.has('Space')) return
+        if (heldKeysRef.current.has('Space')) return
         if (diceGroups.filter(diceGroup => diceGroup.dice.length === 1).length > 0) {
             setDice(prevDice => [
                 ...prevDice,
@@ -50,7 +45,7 @@ const DiePallete: React.FC = () => {
             ])
             setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.dice.length > 1))
         }
-    }, [diceGroups, heldKeys])
+    }, [diceGroups])
 
     // Callbacks
     const rollDie = useCallback((die: Die): Die => {
