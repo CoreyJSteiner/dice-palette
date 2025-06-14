@@ -16,7 +16,14 @@ const DiePallete: React.FC = () => {
     // Effects
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (!e.repeat) heldKeysRef.current.add(e.code)
+            if (!e.repeat) {
+                heldKeysRef.current.add(e.code)
+                console.log(e.code)
+                if (e.code === 'Tab') {
+                    e.preventDefault()
+                    handleRollAll()
+                }
+            }
         }
 
         const handleKeyUp = (e: KeyboardEvent) => {
