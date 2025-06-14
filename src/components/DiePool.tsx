@@ -1,4 +1,5 @@
 import type React from "react"
+import { useMemo } from "react"
 import DieDisplay from "./DieDisplay"
 import DiceGroupDisplay from "./DiceGroupDisplay"
 import Die from "./Die"
@@ -18,6 +19,10 @@ type DiePoolProps = {
     rollDiceGroupHandler: (groupKey: string) => void
 }
 
+type PoolItem =
+    | { type: "die"; data: Die }
+    | { type: "group"; data: DiceGroup }
+
 const DiePool: React.FC<DiePoolProps> = ({
     dice = [],
     diceGroups = [],
@@ -30,6 +35,12 @@ const DiePool: React.FC<DiePoolProps> = ({
     destroyGroupHandler,
     rollDiceGroupHandler
 }) => {
+
+    // Memos
+    const diceAndGroups: Array<PoolItem> = useMemo(() => [
+        ...diceGroups.map(group => ({ type: "group", data: group } as PoolItem)),
+        ...dice.map(die => ({ type: "die", data: die } as PoolItem))
+    ], [dice, diceGroups])
 
     // Handlers
     const handleDragEnd = (event: DragEndEvent) => {
@@ -63,22 +74,23 @@ const DiePool: React.FC<DiePoolProps> = ({
         <div className="die-pool-container">
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="die-pool">
-                    {diceGroups.map(diceGroup => (
-                        <DiceGroupDisplay
-                            key={diceGroup.key}
-                            diceGroup={diceGroup}
-                            dieInGroupClickHandler={dieInGroupClickHandler}
-                            destroyGroupHandler={destroyGroupHandler}
-                            rollDiceGroupHandler={rollDiceGroupHandler}
-                        />
-                    ))}
-                    {dice.map(die => (
-                        <DieDisplay
-                            key={die.key}
-                            die={die}
-                            dieClickHandler={dieClickHandler}
-                        />
-                    ))}
+                    {diceAndGroups.map(poolItem => {
+                        if (poolItem.type === 'group') {
+                            return <DiceGroupDisplay
+                                key={poolItem.data.key}
+                                diceGroup={poolItem.data}
+                                dieInGroupClickHandler={dieInGroupClickHandler}
+                                destroyGroupHandler={destroyGroupHandler}
+                                rollDiceGroupHandler={rollDiceGroupHandler}
+                            />
+                        } else {
+                            return <DieDisplay
+                                key={poolItem.data.key}
+                                die={poolItem.data}
+                                dieClickHandler={dieClickHandler}
+                            />
+                        }
+                    })}
                 </div>
 
                 <div className="button-bottom-container">
