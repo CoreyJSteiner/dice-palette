@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
-import type Die from "./Die"
+import type { Die } from "./Die"
 import DieImage from "./DieImage"
 import type { CSSProperties } from "react"
 
@@ -28,7 +28,7 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
     // Drag Ref
     const { setNodeRef: setDropRef } = useDroppable({
         id: die.key,
-        data: die
+        data: { type: 'die', details: die }
     })
 
     const { attributes, listeners, transform, setNodeRef: setDragRef } = useDraggable({

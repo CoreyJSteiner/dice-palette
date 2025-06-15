@@ -102,7 +102,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     // Drag Ref
     const { setNodeRef } = useDroppable({
         id: diceGroup.key,
-        data: diceGroup
+        data: { type: 'group', details: diceGroup }
     })
 
     const combinedRef = (node: HTMLDivElement | null) => {

@@ -2,37 +2,35 @@ import { useCallback, useEffect, useState, useRef } from 'react'
 import './DieComponent.css'
 import DieOptions from "./DieOptions"
 import DiePool from "./DiePool"
-import Die from './Die'
+import type { Die } from './Die'
 import type { DiceGroup } from './DiceGroup'
 
-type DieArray = Array<Die>
-type DiceGroups = Array<DiceGroup>
-
 const DiePallete: React.FC = () => {
-    const [dice, setDice] = useState<DieArray>([])
-    const [diceGroups, setDiceGroups] = useState<DiceGroups>([])
+    const [dice, setDice] = useState<Die[]>([])
+    const [diceGroups, setDiceGroups] = useState<DiceGroup[]>([])
     const heldKeysRef = useRef<Set<string>>(new Set())
+    const rollAllButtonRef = useRef<HTMLButtonElement>(null)
 
     // Effects
     useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
+        const handleKeyDown = (e: KeyboardEvent): void => {
             if (!e.repeat) {
                 heldKeysRef.current.add(e.code)
                 console.log(e.code)
                 if (e.code === 'Tab') {
                     e.preventDefault()
-                    handleRollAll()
+                    rollAllButtonRef.current?.click()
                 }
             }
         }
 
-        const handleKeyUp = (e: KeyboardEvent) => {
+        const handleKeyUp = (e: KeyboardEvent): void => {
             heldKeysRef.current.delete(e.code);
         }
 
         window.addEventListener('keydown', handleKeyDown);
         window.addEventListener('keyup', handleKeyUp);
-        return () => {
+        return (): void => {
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
         };
@@ -42,11 +40,10 @@ const DiePallete: React.FC = () => {
     useEffect(() => {
         if (heldKeysRef.current.has('Space')) return
         if (diceGroups.filter(diceGroup => diceGroup.dice.length === 1).length > 0) {
-            setDice(prevDice => [
+            setDice((prevDice) => [
                 ...prevDice,
                 ...diceGroups.filter(diceGroup => diceGroup.dice.length === 1).map(diceGroup => {
-                    const { key, dieSides, dieValue } = diceGroup.dice[0]
-                    return new Die(key, dieSides, dieValue, null)
+                    return { ...diceGroup.dice[0], groupKey: null }
                 })
             ])
             setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.dice.length > 1))
@@ -55,9 +52,7 @@ const DiePallete: React.FC = () => {
 
     // Callbacks
     const rollDie = useCallback((die: Die): Die => {
-        const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
-        newDie.roll()
-        return newDie
+        return { ...die, dieValue: Math.floor(Math.random() * die.dieSides + 1) }
     }, [])
 
     const rollDieById = useCallback((die: Die, dieKey: string): Die => {
@@ -69,78 +64,77 @@ const DiePallete: React.FC = () => {
     }, [rollDie])
 
     // Handlers
-    const handleNewDie = (dieSides: number, groupKey: string | null | undefined) => {
+    const handleNewDie = (dieSides: number, groupKey: string | null | undefined): void => {
         if (groupKey) {
-            console.log(groupKey)
-            const newDie = new Die(crypto.randomUUID(), dieSides, undefined, groupKey)
+            const newDie = {
+                key: crypto.randomUUID(),
+                dieSides: dieSides,
+                groupKey: groupKey
+            }
             const existingDiceGroup = diceGroups.find(diceGroup => diceGroup.key === groupKey)
             const existingDice = existingDiceGroup ? existingDiceGroup.dice : []
-            setDiceGroups(prevDiceGroups => [
+            setDiceGroups((prevDiceGroups: DiceGroup[]): DiceGroup[] => [
                 ...prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey),
                 { key: groupKey, dice: [...existingDice, newDie] }
             ])
         } else {
-            setDice([...dice, new Die(crypto.randomUUID(), dieSides)])
+            setDice([...dice, { key: crypto.randomUUID(), dieSides }])
         }
     }
 
-    const handleClearDice = () => {
+    const handleClearDice = (): void => {
         setDice([])
         setDiceGroups([])
     }
 
-    const handleResetDice = () => {
-        const removeDieValue = (die: Die) => new Die(die.key, die.dieSides, undefined, die.groupKey)
+    const handleResetDice = (): void => {
+        const removeDieValue = (die: Die): Die => {
+            return { ...die, dieValue: null }
+        }
 
         setDice(prevDice => prevDice.map(die => removeDieValue(die)))
         setDiceGroups(prevDiceGroup => prevDiceGroup.map(diceGroup => {
             return { key: diceGroup.key, dice: diceGroup.dice.map(die => removeDieValue(die)) }
         }))
-
     }
 
-    const handleDieClick = (dieKey: string) => {
+    const handleDieClick = (dieKey: string): void => {
         setDice(prevDice => prevDice.map(die => {
             return rollDieById(die, dieKey)
         }))
     }
 
-    const handleDestroyGroup = (groupKey: string) => {
+    const handleDestroyGroup = (groupKey: string): void => {
         const dice: Array<Die> = diceGroups.filter(diceGroup => diceGroup.key === groupKey)[0].dice
         setDice(prevDice => [
             ...prevDice,
             ...dice.map(die => {
-                return new Die(die.key, die.dieSides, die.dieValue, undefined)
+                return { ...die, groupKey: null }
             })
         ])
         setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey))
     }
 
-    const handleRollDiceGroup = (groupKey: string) => {
+    const handleRollDiceGroup = (groupKey: string): void => {
         setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
             if (diceGroup.key === groupKey) {
-                return { key: diceGroup.key, dice: diceGroup.dice.map(die => rollDie(die)) }
+                return { ...diceGroup, dice: diceGroup.dice.map(die => rollDie(die)) }
             }
 
             return diceGroup
         }))
     }
 
-    const handleAddDieToGroup = (dieData: Die, targetGroupKey: string | undefined) => {
+    const handleAddDieToGroup = (dieData: Die, targetGroupKey?: string | null): void => {
         if (targetGroupKey) {
             setDice(prevDice => prevDice.filter(die => die.key !== dieData.key))
             setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
                 if (diceGroup.key === targetGroupKey) {
-                    const newGroup = {
+                    const newGroup: DiceGroup = {
                         key: diceGroup.key,
                         dice: [
                             ...diceGroup.dice,
-                            new Die(
-                                dieData.key,
-                                dieData.dieSides,
-                                dieData.dieValue,
-                                diceGroup.key
-                            )
+                            { ...dieData, groupKey: diceGroup.key }
                         ]
                     }
                     return newGroup
@@ -168,12 +162,12 @@ const DiePallete: React.FC = () => {
             }).filter(group => group.dice.length > 0))
             setDice(prevDice => [
                 ...prevDice,
-                new Die(dieData.key, dieData.dieSides, dieData.dieValue, null)
+                { ...dieData, groupKey: null }
             ])
         }
     }
 
-    const handleCreateGroup = (dice: Array<Die>) => {
+    const handleCreateGroup = (dice: Array<Die>): void => {
         const diceKeys = dice.map(die => die.key)
         const diceOldGroups = dice.map(die => die.groupKey)
         const newGroupKey = crypto.randomUUID()
@@ -193,12 +187,14 @@ const DiePallete: React.FC = () => {
             }),
             {
                 key: newGroupKey,
-                dice: dice.map(die => new Die(die.key, die.dieSides, die.dieValue, newGroupKey))
+                dice: dice.map(die => {
+                    return { ...die, groupKey: newGroupKey }
+                })
             }
         ].filter(group => group.dice.length > 0))
     }
 
-    const handleDieInGroupClick = (groupKey: string, dieKey: string) => {
+    const handleDieInGroupClick = (groupKey: string, dieKey: string): void => {
         const diceGroupReplace = (diceGroup: DiceGroup): DiceGroup => {
             if (diceGroup.key === groupKey) {
                 const newDice = diceGroup.dice.map(die => {
@@ -215,18 +211,14 @@ const DiePallete: React.FC = () => {
         }))
     }
 
-    const handleRollAll = () => {
+    const handleRollAll = (): void => {
         setDice(prevDice => prevDice.map(die => {
-            const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
-            newDie.roll()
-            return newDie
+            return rollDie(die)
         }))
 
         setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
             const newDice = diceGroup.dice.map(die => {
-                const newDie = new Die(die.key, die.dieSides, undefined, die.groupKey)
-                newDie.roll()
-                return newDie
+                return rollDie(die)
             })
 
             return { key: diceGroup.key, dice: newDice }
@@ -248,7 +240,7 @@ const DiePallete: React.FC = () => {
                 destroyGroupHandler={handleDestroyGroup}
                 rollDiceGroupHandler={handleRollDiceGroup}
             />
-            <button className='die-pallete-roll-all' onClick={handleRollAll}>Roll All</button>
+            <button ref={rollAllButtonRef} className='die-pallete-roll-all' onClick={handleRollAll}>Roll All</button>
         </div>
     )
 }
