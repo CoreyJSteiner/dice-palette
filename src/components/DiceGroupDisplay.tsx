@@ -36,6 +36,25 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }, [isExpanded])
 
     // Handlers
+    const displayNum = () => {
+        const diceValues = diceGroup.dice.map(die => die.dieValue ? die.dieValue : 0)
+
+        switch (displayState) {
+            case '+':
+                return diceValues.reduce((sum, dieValue) => sum + dieValue)
+                break;
+            case 'kh':
+                return Math.max(...diceValues)
+                break;
+            case 'kl':
+                return Math.min(...diceValues)
+                break;
+            default:
+                return diceValues.reduce((sum, dieValue) => sum + dieValue)
+                break;
+        }
+    }
+
     const handleDieInGroupClick = (dieKey: string) => {
         dieInGroupClickHandler(diceGroup.key, dieKey)
     }
@@ -121,7 +140,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         >
             {isExpanded && (
                 <div>
-                    <h1 className='dice-group-expand-display'>{diceGroup.display(displayState)}</h1>
+                    <h1 className='dice-group-expand-display'>{displayNum()}</h1>
                     <button
                         className="minimize-button"
                         onClick={handleMinimizeClick}
@@ -136,7 +155,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
                     className="dice-group-collapse-cover"
                     onContextMenu={handleRightClickOnCollapse}
                 >
-                    <h1 className='dice-group-collapse-display'>{diceGroup.display(displayState)}</h1>
+                    <h1 className='dice-group-collapse-display'>{displayNum()}</h1>
                     <p className='dice-group-collapse-display-state'>{displayState}</p>
                 </div>
             )
