@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState, useRef } from 'react'
 import './DieComponent.css'
 import DieOptions from "./DieOptions"
 import DiePool from "./DiePool"
-import type { Die } from './Die'
-import type { DiceGroup } from './DiceGroup'
+import type { Die, DiceGroup, PoolItem } from './DiePalleteTypes'
 
 const DiePallete: React.FC = () => {
     const [dice, setDice] = useState<Die[]>([])
     const [diceGroups, setDiceGroups] = useState<DiceGroup[]>([])
+    const [pool, setPool] = useState<PoolItem[]>([])
     const heldKeysRef = useRef<Set<string>>(new Set())
     const rollAllButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -231,6 +231,7 @@ const DiePallete: React.FC = () => {
             <DiePool
                 dice={dice}
                 diceGroups={diceGroups}
+                pool={pool}
                 clearClickHandler={handleClearDice}
                 resetClickHandler={handleResetDice}
                 dieClickHandler={handleDieClick}

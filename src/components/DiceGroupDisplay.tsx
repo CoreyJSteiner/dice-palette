@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useDroppable } from "@dnd-kit/core"
-import type { DiceGroup } from "./DiceGroup"
+import type { DiceGroup } from "./DiePalleteTypes"
 import DieDisplay from "./DieDisplay"
 
 type DiceGroupDisplayProps = {

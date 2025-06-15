@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
-import type { Die } from "./Die"
+import type { Die } from "./DiePalleteTypes"
 import DieImage from "./DieImage"
 import type { CSSProperties } from "react"
 

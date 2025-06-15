@@ -2,13 +2,13 @@ import type React from "react"
 import { useMemo } from "react"
 import DieDisplay from "./DieDisplay"
 import DiceGroupDisplay from "./DiceGroupDisplay"
-import type { Die } from "./Die"
-import type { DiceGroup } from "./DiceGroup"
+import type { Die, DiceGroup, PoolItem } from "./DiePalleteTypes"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 
 type DiePoolProps = {
     dice: Array<Die>
     diceGroups: Array<DiceGroup>
+    pool: PoolItem[]
     dieClickHandler: (key: string) => void
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
     clearClickHandler: () => void
@@ -19,13 +19,10 @@ type DiePoolProps = {
     rollDiceGroupHandler: (groupKey: string) => void
 }
 
-type PoolItem =
-    | { type: "die"; details: Die }
-    | { type: "group"; details: DiceGroup }
-
 const DiePool: React.FC<DiePoolProps> = ({
     dice = [],
     diceGroups = [],
+    pool = [],
     clearClickHandler,
     resetClickHandler,
     dieClickHandler,
@@ -44,6 +41,8 @@ const DiePool: React.FC<DiePoolProps> = ({
 
     // Handlers
     const handleDragEnd = (event: DragEndEvent) => {
+        console.log(pool)
+
         const { active, over } = event
 
         const dieData = active.data.current as Die
