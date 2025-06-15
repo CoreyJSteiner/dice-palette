@@ -1,13 +1,6 @@
-import type Die from "./Die"
+import Die from "./Die"
 
-class DiceGroup {
+export type DiceGroup = {
     key: string
     dice: Array<Die>
-
-    constructor(key: string, dice: Array<Die>) {
-        this.key = key
-        this.dice = dice
-    }
 }
-
-export default DiceGroup

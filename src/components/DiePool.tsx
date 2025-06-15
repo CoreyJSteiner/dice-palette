@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import DieDisplay from "./DieDisplay"
 import DiceGroupDisplay from "./DiceGroupDisplay"
 import Die from "./Die"
-import DiceGroup from "./DiceGroup"
+import type { DiceGroup } from "./DiceGroup"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 
 type DiePoolProps = {
@@ -55,7 +55,8 @@ const DiePool: React.FC<DiePoolProps> = ({
             || (dieData.groupKey && dieData.groupKey === targetData?.groupKey)
         ) return
 
-        if (targetData instanceof DiceGroup || !targetData) {
+        // !!Repalce targetData?.dice with PoolItem type check on PoolItem Refector!!
+        if (targetData?.dice || !targetData) {
             addToGroupHandler(dieData, targetData?.key)
         }
         else if (targetData instanceof Die && dieData.key !== targetData.key) {
