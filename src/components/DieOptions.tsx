@@ -3,12 +3,12 @@ import DieButton from "./DieButton"
 import { useState, useEffect, useRef } from "react"
 
 type DieOptionsProps = {
-    onAddDie: (dieSides: number, groupKey: string | null | undefined) => void
+    onAddDie: (dieSides: number, groupKey?: string | null) => void
 }
 
 const DieOptions: React.FC<DieOptionsProps> = ({ onAddDie }) => {
     const [isHovering, setIsHovering] = useState(false)
-    const [addGroup, setAddGroup] = useState<string | null | undefined>(null)
+    const [addGroup, setAddGroup] = useState<string | null>(null)
     const containerRef = useRef<HTMLDivElement>(null)
 
     // Effects

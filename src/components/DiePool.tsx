@@ -33,7 +33,7 @@ const DiePool: React.FC<DiePoolProps> = ({
         const { active, over } = event
 
         const dieData = active.data.current as Die
-        const targetData: PoolItem | undefined = over ? over.data.current as PoolItem : undefined
+        const targetData: PoolItem | null = over ? over.data.current as PoolItem : null
 
         if (dieData.key === targetData?.id
             || (dieData.groupKey && targetData?.type === 'die' && dieData.groupKey === targetData?.details.groupKey)
