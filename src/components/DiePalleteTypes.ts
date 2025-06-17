@@ -1,6 +1,6 @@
 export type PoolItem =
-    | { type: "die"; details: Die }
-    | { type: "group"; details: DiceGroup }
+    | { id: string, type: "die"; details: Die }
+    | { id: string, type: "group"; details: DiceGroup }
 
 export type DiceGroup = {
     key: string

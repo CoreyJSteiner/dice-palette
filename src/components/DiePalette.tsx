@@ -5,9 +5,7 @@ import DiePool from "./DiePool"
 import type { Die, DiceGroup, PoolItem } from './DiePalleteTypes'
 
 const DiePallete: React.FC = () => {
-    const [dice, setDice] = useState<Die[]>([])
-    const [diceGroups, setDiceGroups] = useState<DiceGroup[]>([])
-    const [pool, setPool] = useState<PoolItem[]>([])
+    const [poolState, setPoolState] = useState<PoolItem[]>([])
     const heldKeysRef = useRef<Set<string>>(new Set())
     const rollAllButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -16,7 +14,6 @@ const DiePallete: React.FC = () => {
         const handleKeyDown = (e: KeyboardEvent): void => {
             if (!e.repeat) {
                 heldKeysRef.current.add(e.code)
-                console.log(e.code)
                 if (e.code === 'Tab') {
                     e.preventDefault()
                     rollAllButtonRef.current?.click()
@@ -39,52 +36,106 @@ const DiePallete: React.FC = () => {
 
     useEffect(() => {
         if (heldKeysRef.current.has('Space')) return
-        if (diceGroups.filter(diceGroup => diceGroup.dice.length === 1).length > 0) {
-            setDice((prevDice) => [
-                ...prevDice,
-                ...diceGroups.filter(diceGroup => diceGroup.dice.length === 1).map(diceGroup => {
-                    return { ...diceGroup.dice[0], groupKey: null }
-                })
-            ])
-            setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.dice.length > 1))
-        }
-    }, [diceGroups])
+        const singleGroups: PoolItem[] = poolState.filter(poolItem => (
+            poolItem.type === 'group' && poolItem.details.dice.length === 1
+        ))
+        const removalGroups = new Set(singleGroups.map(group => group.id))
 
-    // Callbacks
+        if (singleGroups.length > 0) {
+            setPoolState((prevPoolState) => {
+                const updatedPoolState: PoolItem[] = prevPoolState.filter(poolItem => (
+                    !removalGroups.has(poolItem.id)
+                ))
+
+                const orphPoolItems = singleGroups.reduce((orphDice: PoolItem[], orphPoolItem: PoolItem) => {
+                    if (orphPoolItem.type === 'die') {
+                        orphDice.push(orphPoolItem)
+
+                        return orphDice
+                    }
+
+                    const newPoolItemsDie: PoolItem[] = orphPoolItem.details.dice.map((die: Die) => {
+                        return {
+                            id: die.key,
+                            type: 'die',
+                            details: { ...die, groupKey: null }
+                        }
+                    })
+
+                    return orphDice.concat(newPoolItemsDie)
+                }, [] as PoolItem[])
+
+                return updatedPoolState.concat(orphPoolItems)
+            })
+        }
+    }, [poolState])
+
+    // Generic Functions
     const rollDie = useCallback((die: Die): Die => {
         return { ...die, dieValue: Math.floor(Math.random() * die.dieSides + 1) }
     }, [])
 
-    const rollDieById = useCallback((die: Die, dieKey: string): Die => {
-        if (die.key === dieKey) {
-            return rollDie(die)
+    // Pool Setters
+    const poolAddDieToGroup = (inputDie: Die, groupKey: string): void => {
+        setPoolState(prevPoolState => {
+            if (prevPoolState.find(poolItem => poolItem.id === groupKey)) {
+                const updatedPoolState = prevPoolState.map(poolItem => {
+                    if (poolItem.id === groupKey && poolItem.type === 'group') {
+                        const updatedPoolItem: PoolItem = structuredClone(poolItem)
+                        updatedPoolItem.details.dice = [
+                            ...updatedPoolItem.details.dice,
+                            { ...inputDie }
+                        ]
+
+                        return updatedPoolItem
+                    }
+
+                    return poolItem
+                })
+                return updatedPoolState
+            }
+
+            const newPoolItemGroup: PoolItem = {
+                id: groupKey,
+                type: 'group',
+                details: {
+                    key: groupKey,
+                    dice: [{ ...inputDie, groupKey: groupKey } as Die]
+                }
+            }
+
+            return [...prevPoolState, newPoolItemGroup] as PoolItem[]
+        })
+    }
+
+    const poolAddDieToPool = (inputDie: Die): void => {
+        const newPoolItem: PoolItem = {
+            id: inputDie.key,
+            type: 'die',
+            details: inputDie
         }
 
-        return die
-    }, [rollDie])
+        setPoolState(prevPoolState => [...prevPoolState, newPoolItem])
+    }
 
     // Handlers
-    const handleNewDie = (dieSides: number, groupKey: string | null | undefined): void => {
+    const handleNewDie = (dieSides: number, groupKey?: string | null): void => {
+        const newDie = {
+            key: crypto.randomUUID(),
+            dieSides: dieSides,
+            groupKey: groupKey
+        }
         if (groupKey) {
-            const newDie = {
-                key: crypto.randomUUID(),
-                dieSides: dieSides,
-                groupKey: groupKey
-            }
-            const existingDiceGroup = diceGroups.find(diceGroup => diceGroup.key === groupKey)
-            const existingDice = existingDiceGroup ? existingDiceGroup.dice : []
-            setDiceGroups((prevDiceGroups: DiceGroup[]): DiceGroup[] => [
-                ...prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey),
-                { key: groupKey, dice: [...existingDice, newDie] }
-            ])
+            poolAddDieToGroup(newDie, groupKey)
+
         } else {
-            setDice([...dice, { key: crypto.randomUUID(), dieSides }])
+            poolAddDieToPool(newDie)
+
         }
     }
 
     const handleClearDice = (): void => {
-        setDice([])
-        setDiceGroups([])
+        setPoolState([])
     }
 
     const handleResetDice = (): void => {
@@ -92,136 +143,170 @@ const DiePallete: React.FC = () => {
             return { ...die, dieValue: null }
         }
 
-        setDice(prevDice => prevDice.map(die => removeDieValue(die)))
-        setDiceGroups(prevDiceGroup => prevDiceGroup.map(diceGroup => {
-            return { key: diceGroup.key, dice: diceGroup.dice.map(die => removeDieValue(die)) }
-        }))
-    }
-
-    const handleDieClick = (dieKey: string): void => {
-        setDice(prevDice => prevDice.map(die => {
-            return rollDieById(die, dieKey)
+        setPoolState(prevPoolState => prevPoolState.map(poolItem => {
+            const updatedItem = structuredClone(poolItem)
+            if (updatedItem.type === 'group') {
+                const group: DiceGroup = updatedItem.details
+                updatedItem.details.dice = group.dice.map(die => removeDieValue(die))
+            } else if (updatedItem.type === 'die') {
+                updatedItem.details = removeDieValue(updatedItem.details)
+            }
+            return updatedItem
         }))
     }
 
     const handleDestroyGroup = (groupKey: string): void => {
-        const dice: Array<Die> = diceGroups.filter(diceGroup => diceGroup.key === groupKey)[0].dice
-        setDice(prevDice => [
-            ...prevDice,
-            ...dice.map(die => {
-                return { ...die, groupKey: null }
-            })
-        ])
-        setDiceGroups(prevDiceGroups => prevDiceGroups.filter(diceGroup => diceGroup.key !== groupKey))
-    }
+        const dieToPoolItem = (die: Die): PoolItem => {
+            return { id: die.key, type: 'die', details: { ...die, groupKey: null } }
+        }
 
-    const handleRollDiceGroup = (groupKey: string): void => {
-        setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
-            if (diceGroup.key === groupKey) {
-                return { ...diceGroup, dice: diceGroup.dice.map(die => rollDie(die)) }
-            }
-
-            return diceGroup
-        }))
+        setPoolState(prevPoolState => {
+            let poolItemsDie: PoolItem[] = []
+            return prevPoolState.filter(poolItem => {
+                if (poolItem.id !== groupKey) return true
+                if (poolItem.id === groupKey && poolItem.type === 'group') {
+                    poolItemsDie = poolItem.details.dice.map(die => {
+                        return dieToPoolItem(die)
+                    })
+                }
+                return false
+            }).concat(poolItemsDie)
+        })
     }
 
     const handleAddDieToGroup = (dieData: Die, targetGroupKey?: string | null): void => {
-        if (targetGroupKey) {
-            setDice(prevDice => prevDice.filter(die => die.key !== dieData.key))
-            setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
-                if (diceGroup.key === targetGroupKey) {
-                    const newGroup: DiceGroup = {
-                        key: diceGroup.key,
-                        dice: [
-                            ...diceGroup.dice,
-                            { ...dieData, groupKey: diceGroup.key }
-                        ]
-                    }
-                    return newGroup
+        setPoolState(prevPoolState => {
+            const removeFromGroup: string | null = dieData.groupKey ? dieData.groupKey : null
+
+            const updatedPoolState = prevPoolState.map(poolItem => {
+                if (poolItem.type === 'group' && removeFromGroup === poolItem.id) {
+                    const updatedGroup = structuredClone(poolItem.details)
+                    updatedGroup.dice = updatedGroup.dice.filter(die => die.key !== dieData.key)
+
+                    return { ...poolItem, details: updatedGroup }
+                } else if (poolItem.type === 'group' && poolItem.id === targetGroupKey) {
+                    const updatedGroup = structuredClone(poolItem.details)
+                    updatedGroup.dice = [...updatedGroup.dice, { ...dieData, groupKey: poolItem.id }]
+
+                    return { ...poolItem, details: updatedGroup }
                 }
 
-                if (diceGroup.key === dieData.groupKey) {
-                    const oldGroup = {
-                        key: diceGroup.key,
-                        dice: diceGroup.dice.filter(die => die.key !== dieData.key)
-                    }
-                    return oldGroup
-                }
+                return poolItem
+            }).filter(poolItem => (
+                (poolItem.type === 'die' && poolItem.id !== dieData.key) ||
+                (poolItem.type === 'group' && poolItem.details.dice.length > 0)
+            ))
 
-                return diceGroup
-            }).filter(group => group.dice.length > 0))
-        } else if (dieData.groupKey) {
-            setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
-                const newDice: Array<Die> = []
-                diceGroup.dice.forEach(die => {
-                    if (die.key !== dieData.key) newDice.push(die)
-                })
+            if (!targetGroupKey) updatedPoolState.push({
+                id: dieData.key,
+                type: 'die',
+                details: { ...dieData, groupKey: null }
+            })
 
-                const newGroup = { key: diceGroup.key, dice: newDice }
-                return newGroup
-            }).filter(group => group.dice.length > 0))
-            setDice(prevDice => [
-                ...prevDice,
-                { ...dieData, groupKey: null }
-            ])
-        }
+            return updatedPoolState
+        })
     }
 
-    const handleCreateGroup = (dice: Array<Die>): void => {
-        const diceKeys = dice.map(die => die.key)
-        const diceOldGroups = dice.map(die => die.groupKey)
-        const newGroupKey = crypto.randomUUID()
-        setDice(prevDice => prevDice.filter(die => {
-            return !diceKeys.includes(die.key)
-        }))
-        setDiceGroups(prevDiceGroups => [
-            ...prevDiceGroups.map(prevDiceGroup => {
-                if (diceOldGroups.includes(prevDiceGroup.key)) {
-                    return {
-                        key: prevDiceGroup.key,
-                        dice: prevDiceGroup.dice.filter(die => !diceKeys.includes(die.key))
-                    }
+    const handleCreateGroup = (inputDice: Array<Die>): void => {
+        setPoolState(prevPoolState => {
+            type DiceRemovalMap = Record<string, Set<string>>
+            const diceGroupRemovals: DiceRemovalMap = inputDice.reduce((groupMap: DiceRemovalMap, die: Die) => {
+                if (die.groupKey) {
+                    if (!groupMap[die.groupKey]) groupMap[die.groupKey] = new Set()
+                    groupMap[die.groupKey].add(die.groupKey)
                 }
+                return groupMap
+            }, {})
+            const diceRemovals = new Set(inputDice.map(die => die.key))
 
-                return prevDiceGroup
-            }),
-            {
-                key: newGroupKey,
-                dice: dice.map(die => {
-                    return { ...die, groupKey: newGroupKey }
-                })
-            }
-        ].filter(group => group.dice.length > 0))
+            const isRemovalGroup = (groupKey: string): boolean => groupKey in diceGroupRemovals
+            const isRemovalDie = (dieKey: string): boolean => diceRemovals.has(dieKey)
+
+            const updatedPoolState = prevPoolState.map(poolItem => {
+                if (poolItem.type === 'group' && isRemovalGroup(poolItem.id)) {
+                    const updatedGroup = structuredClone(poolItem.details)
+                    updatedGroup.dice = updatedGroup.dice.filter(die => !isRemovalDie(die.key))
+
+                    return { ...poolItem, details: updatedGroup }
+                }
+                return poolItem
+            }).filter(poolItem => (
+                !isRemovalDie(poolItem.id) ||
+                (poolItem.type === 'group' && poolItem.details.dice.length > 0)
+            ))
+
+            const newGroupId = crypto.randomUUID()
+
+            updatedPoolState.push({
+                id: newGroupId,
+                type: 'group',
+                details: {
+                    key: newGroupId,
+                    dice: inputDice.map(die => {
+                        return { ...die, groupKey: newGroupId }
+                    })
+                }
+            })
+
+            return updatedPoolState
+        })
     }
 
     const handleDieInGroupClick = (groupKey: string, dieKey: string): void => {
-        const diceGroupReplace = (diceGroup: DiceGroup): DiceGroup => {
-            if (diceGroup.key === groupKey) {
-                const newDice = diceGroup.dice.map(die => {
-                    return rollDieById(die, dieKey)
+
+        setPoolState(prevPoolState => prevPoolState.map(poolItem => {
+            if (poolItem.type === 'group' && groupKey === poolItem.id) {
+                const dice = poolItem.details.dice
+                const updatedPoolItem = structuredClone(poolItem)
+                updatedPoolItem.details.dice = dice.map(die => {
+                    if (die.key === dieKey) return rollDie(die)
+                    return die
                 })
 
-                return { key: diceGroup.key, dice: newDice }
+                return updatedPoolItem
             }
-            return diceGroup
-        }
 
-        setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
-            return diceGroupReplace(diceGroup)
+            return poolItem
         }))
     }
 
-    const handleRollAll = (): void => {
-        setDice(prevDice => prevDice.map(die => {
-            return rollDie(die)
+    const handleDieClick = (dieKey: string): void => {
+        setPoolState(prevPoolState => prevPoolState.map(poolItem => {
+            if (poolItem.type === 'die' && poolItem.id === dieKey) return { ...poolItem, details: rollDie(poolItem.details) }
+
+            return poolItem
         }))
+    }
 
-        setDiceGroups(prevDiceGroups => prevDiceGroups.map(diceGroup => {
-            const newDice = diceGroup.dice.map(die => {
-                return rollDie(die)
+
+    const handleRollDiceGroup = (groupKey: string): void => {
+        setPoolState(prevPoolState => {
+            return prevPoolState.map(poolItem => {
+                if (poolItem.type === 'group' && poolItem.id === groupKey) {
+                    const dice = poolItem.details.dice
+                    const updatedPoolItem = structuredClone(poolItem)
+                    updatedPoolItem.details.dice = dice.map(die => rollDie(die))
+
+                    return updatedPoolItem
+                }
+
+                return poolItem
             })
+        })
+    }
 
-            return { key: diceGroup.key, dice: newDice }
+    const handleRollAll = (): void => {
+        setPoolState(prevPoolState => prevPoolState.map(poolItem => {
+            if (poolItem.type === 'die') return { ...poolItem, details: rollDie(poolItem.details) }
+            if (poolItem.type === 'group') {
+                const dice = poolItem.details.dice
+                const updatedPoolItem = structuredClone(poolItem)
+                updatedPoolItem.details.dice = dice.map(die => rollDie(die))
+
+                return updatedPoolItem
+            }
+
+            return poolItem
         }))
     }
 
@@ -229,9 +314,7 @@ const DiePallete: React.FC = () => {
         <div className="die-pallete">
             <DieOptions onAddDie={handleNewDie} />
             <DiePool
-                dice={dice}
-                diceGroups={diceGroups}
-                pool={pool}
+                pool={poolState}
                 clearClickHandler={handleClearDice}
                 resetClickHandler={handleResetDice}
                 dieClickHandler={handleDieClick}

@@ -1,13 +1,10 @@
 import type React from "react"
-import { useMemo } from "react"
 import DieDisplay from "./DieDisplay"
 import DiceGroupDisplay from "./DiceGroupDisplay"
-import type { Die, DiceGroup, PoolItem } from "./DiePalleteTypes"
+import type { Die, PoolItem } from "./DiePalleteTypes"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 
 type DiePoolProps = {
-    dice: Array<Die>
-    diceGroups: Array<DiceGroup>
     pool: PoolItem[]
     dieClickHandler: (key: string) => void
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
@@ -20,8 +17,6 @@ type DiePoolProps = {
 }
 
 const DiePool: React.FC<DiePoolProps> = ({
-    dice = [],
-    diceGroups = [],
     pool = [],
     clearClickHandler,
     resetClickHandler,
@@ -33,39 +28,25 @@ const DiePool: React.FC<DiePoolProps> = ({
     rollDiceGroupHandler
 }) => {
 
-    // Memos
-    const diceAndGroups: Array<PoolItem> = useMemo(() => [
-        ...diceGroups.map(group => ({ type: "group", details: group } as PoolItem)),
-        ...dice.map(die => ({ type: "die", details: die } as PoolItem))
-    ], [dice, diceGroups])
-
     // Handlers
     const handleDragEnd = (event: DragEndEvent) => {
-        console.log(pool)
-
         const { active, over } = event
 
         const dieData = active.data.current as Die
         const targetData: PoolItem | undefined = over ? over.data.current as PoolItem : undefined
 
-        console.dir(dieData)
-        console.dir(targetData)
-        // Escape conditions
-        if (dieData.key === targetData?.details.key
-            || (targetData?.type === 'die' && dieData.groupKey && dieData.groupKey === targetData?.details.groupKey)
+        if (dieData.key === targetData?.id
+            || (dieData.groupKey && targetData?.type === 'die' && dieData.groupKey === targetData?.details.groupKey)
             || (targetData?.type === 'group' && dieData.groupKey && dieData.groupKey === targetData?.details.key)) return
 
-        if (!targetData) {
-            console.log('target null => removeGroup')
+        if (!targetData || (targetData.type === 'die' && dieData.groupKey && !targetData.details.groupKey)) {
             addToGroupHandler(dieData, null)
         } else if (targetData.type === 'group' || (targetData.type === 'die' && targetData.details.groupKey)) {
-            console.log('target die && groupKey || target group => add to existing Group')
             addToGroupHandler(
                 dieData,
                 targetData.type === 'die' ? targetData.details.groupKey : targetData.details.key
             )
         } else if (targetData.type === 'die' && !dieData.groupKey) {
-            console.log('target die && no groupKey => create new Group')
             createGroupHandler([dieData, targetData.details])
         }
     }
@@ -74,7 +55,7 @@ const DiePool: React.FC<DiePoolProps> = ({
         <div className="die-pool-container">
             <DndContext onDragEnd={handleDragEnd}>
                 <div className="die-pool">
-                    {diceAndGroups.map(poolItem => {
+                    {pool.map(poolItem => {
                         if (poolItem.type === 'group') {
                             return <DiceGroupDisplay
                                 key={poolItem.details.key}

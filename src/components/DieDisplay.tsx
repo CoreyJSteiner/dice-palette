@@ -1,5 +1,5 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
-import type { Die } from "./DiePalleteTypes"
+import type { Die, PoolItem } from "./DiePalleteTypes"
 import DieImage from "./DieImage"
 import type { CSSProperties } from "react"
 
@@ -28,12 +28,12 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
     // Drag Ref
     const { setNodeRef: setDropRef } = useDroppable({
         id: die.key,
-        data: { type: 'die', details: die }
+        data: { id: die.key, type: 'die', details: die } as PoolItem
     })
 
     const { attributes, listeners, transform, setNodeRef: setDragRef } = useDraggable({
         id: die.key,
-        data: die
+        data: die as Die
     })
     const setRefs = (node: HTMLElement | null) => {
         setDragRef(node)
