@@ -6,7 +6,8 @@ import type { Die, PoolItem, PoolItemDie } from "./DiePalleteTypes"
 import {
     DndContext,
     DragOverlay,
-    closestCenter,
+    // closestCenter,
+    pointerWithin,
     useSensor,
     useSensors,
     MouseSensor,
@@ -15,7 +16,7 @@ import {
     type DragOverEvent,
     type DragEndEvent
 } from "@dnd-kit/core"
-import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable"
+import { horizontalListSortingStrategy, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable"
 import { useState, useRef } from "react"
 import { snapCenterToCursor } from "@dnd-kit/modifiers"
 import DieAndValue from "./DieAndValue"
@@ -74,7 +75,7 @@ const DiePool: React.FC<DiePoolProps> = ({
                 } else {
                     setNestingTargetKey('')
                 }
-            }, 750)
+            }, 800)
         }
     }
 
@@ -156,7 +157,8 @@ const DiePool: React.FC<DiePoolProps> = ({
         <div className="die-pool-container">
             <DndContext
                 sensors={sensors}
-                collisionDetection={closestCenter}
+                // collisionDetection={closestCenter}
+                collisionDetection={pointerWithin}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
@@ -164,7 +166,7 @@ const DiePool: React.FC<DiePoolProps> = ({
             >
                 <SortableContext
                     items={pool.map(item => item.id)}
-                    strategy={horizontalListSortingStrategy}
+                    strategy={rectSortingStrategy}
                 >
                     <div className="die-pool">
                         {pool.map(poolItem => poolItemDisplay(poolItem))}
