@@ -133,7 +133,9 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         <div
             ref={combinedRef}
             tabIndex={0}
-            className={`dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}`}
+            className={
+                `dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}`
+            }
             onClick={handleContainerClick}
             onMouseEnter={() => !isExpanded && setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}

@@ -15,7 +15,7 @@ import {
     type DragOverEvent,
     type DragEndEvent
 } from "@dnd-kit/core"
-import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable"
 import { useState, useRef } from "react"
 import { snapCenterToCursor } from "@dnd-kit/modifiers"
 import DieAndValue from "./DieAndValue"
@@ -60,10 +60,12 @@ const DiePool: React.FC<DiePoolProps> = ({
     }
 
     const handleDragOver = (e: DragOverEvent) => {
-        if (!e.over) return
         const { active, over } = e
+
         const activeItemKey = active.id as string
-        const hoverItemKey = over.id as string
+        const hoverItemKey = over ? over.id as string : 'clear'
+
+        console.log(hoverItemKey)
         if (hoverItemKey !== nestingTargetKey) {
             clearTimeout(hoverTimeout.current)
             hoverTimeout.current = setTimeout(() => {
@@ -72,11 +74,36 @@ const DiePool: React.FC<DiePoolProps> = ({
                 } else {
                     setNestingTargetKey('')
                 }
-            }, 500)
+            }, 750)
+        }
+    }
+
+    const handleGrouping = (dieData: Die, targetData: PoolItem | null) => {
+        console.dir({
+            dieData,
+            targetData
+        })
+        if (nestingTargetKey === 'clear') addToGroupHandler(dieData, null)
+
+        setNestingTargetKey('')
+        if (dieData.key === targetData?.id
+            || (dieData.groupKey && targetData?.type === 'die' && dieData.groupKey === targetData?.details.groupKey)
+            || (targetData?.type === 'group' && dieData.groupKey && dieData.groupKey === targetData?.details.key)) return
+
+        if (!targetData || (targetData.type === 'die' && dieData.groupKey && !targetData.details.groupKey)) {
+            addToGroupHandler(dieData, null)
+        } else if (targetData.type === 'group' || (targetData.type === 'die' && targetData.details.groupKey)) {
+            addToGroupHandler(
+                dieData,
+                targetData.type === 'die' ? targetData.details.groupKey : targetData.details.key
+            )
+        } else if (targetData.type === 'die' && !dieData.groupKey) {
+            createGroupHandler([dieData, targetData.details])
         }
     }
 
     const handleDragEnd = (e: DragEndEvent) => {
+        console.log(nestingTargetKey)
         setActivePoolItem(null)
         clearTimeout(hoverTimeout.current)
         const { active, over } = e
@@ -84,21 +111,7 @@ const DiePool: React.FC<DiePoolProps> = ({
         const targetData: PoolItem | null = over ? over.data.current as PoolItem : null
 
         if (nestingTargetKey) {
-            setNestingTargetKey('')
-            if (dieData.key === targetData?.id
-                || (dieData.groupKey && targetData?.type === 'die' && dieData.groupKey === targetData?.details.groupKey)
-                || (targetData?.type === 'group' && dieData.groupKey && dieData.groupKey === targetData?.details.key)) return
-
-            if (!targetData || (targetData.type === 'die' && dieData.groupKey && !targetData.details.groupKey)) {
-                addToGroupHandler(dieData, null)
-            } else if (targetData.type === 'group' || (targetData.type === 'die' && targetData.details.groupKey)) {
-                addToGroupHandler(
-                    dieData,
-                    targetData.type === 'die' ? targetData.details.groupKey : targetData.details.key
-                )
-            } else if (targetData.type === 'die' && !dieData.groupKey) {
-                createGroupHandler([dieData, targetData.details])
-            }
+            handleGrouping(dieData, targetData)
         } else if (over && active.id !== over.id) {
             setPool((prevPool: PoolItem[]): PoolItem[] => {
                 const oldIndex: number = prevPool.findIndex((item: PoolItem) => item.id === active.id)
@@ -151,7 +164,7 @@ const DiePool: React.FC<DiePoolProps> = ({
             >
                 <SortableContext
                     items={pool.map(item => item.id)}
-                    strategy={verticalListSortingStrategy}
+                    strategy={horizontalListSortingStrategy}
                 >
                     <div className="die-pool">
                         {pool.map(poolItem => poolItemDisplay(poolItem))}
