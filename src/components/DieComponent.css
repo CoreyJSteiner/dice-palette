@@ -375,3 +375,7 @@
 .dice-group-close:active {
     font-size: 1.35rem;
 }
+
+.pool-item-hightlight {
+    background-color: red;
+}

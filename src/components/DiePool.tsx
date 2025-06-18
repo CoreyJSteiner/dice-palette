@@ -2,7 +2,9 @@ import type React from "react"
 import DieDisplay from "./DieDisplay"
 import DiceGroupDisplay from "./DiceGroupDisplay"
 import type { Die, PoolItem } from "./DiePalleteTypes"
-import { DndContext, type DragEndEvent } from "@dnd-kit/core"
+import { DndContext } from "@dnd-kit/core"
+import type { DragOverEvent, DragEndEvent } from "@dnd-kit/core"
+import { useState, useRef } from "react"
 
 type DiePoolProps = {
     pool: PoolItem[]
@@ -27,33 +29,61 @@ const DiePool: React.FC<DiePoolProps> = ({
     destroyGroupHandler,
     rollDiceGroupHandler
 }) => {
+    const [nestingTargetKey, setNestingTargetKey] = useState<string>('')
+    const hoverTimeout = useRef<number>(undefined)
 
     // Handlers
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event
+    const handleDragStart = () => {
+        console.log('dragstart')
 
+        setNestingTargetKey('')
+        clearTimeout(hoverTimeout.current)
+    }
+
+    const handleDragOver = (e: DragOverEvent) => {
+        if (!e.over) return
+        const hoverItemKey: string = e.over.id as string
+        if (hoverItemKey !== nestingTargetKey) {
+            clearTimeout(hoverTimeout.current)
+
+            hoverTimeout.current = setTimeout(() => {
+                setNestingTargetKey(hoverItemKey)
+            }, 500)
+        }
+    }
+
+    const handleDragEnd = (e: DragEndEvent) => {
+        console.log('dragend')
+
+        clearTimeout(hoverTimeout.current)
+        const { active, over } = e
         const dieData = active.data.current as Die
         const targetData: PoolItem | null = over ? over.data.current as PoolItem : null
 
-        if (dieData.key === targetData?.id
-            || (dieData.groupKey && targetData?.type === 'die' && dieData.groupKey === targetData?.details.groupKey)
-            || (targetData?.type === 'group' && dieData.groupKey && dieData.groupKey === targetData?.details.key)) return
+        if (nestingTargetKey) {
+            if (dieData.key === targetData?.id
+                || (dieData.groupKey && targetData?.type === 'die' && dieData.groupKey === targetData?.details.groupKey)
+                || (targetData?.type === 'group' && dieData.groupKey && dieData.groupKey === targetData?.details.key)) return
 
-        if (!targetData || (targetData.type === 'die' && dieData.groupKey && !targetData.details.groupKey)) {
-            addToGroupHandler(dieData, null)
-        } else if (targetData.type === 'group' || (targetData.type === 'die' && targetData.details.groupKey)) {
-            addToGroupHandler(
-                dieData,
-                targetData.type === 'die' ? targetData.details.groupKey : targetData.details.key
-            )
-        } else if (targetData.type === 'die' && !dieData.groupKey) {
-            createGroupHandler([dieData, targetData.details])
+            if (!targetData || (targetData.type === 'die' && dieData.groupKey && !targetData.details.groupKey)) {
+                addToGroupHandler(dieData, null)
+            } else if (targetData.type === 'group' || (targetData.type === 'die' && targetData.details.groupKey)) {
+                addToGroupHandler(
+                    dieData,
+                    targetData.type === 'die' ? targetData.details.groupKey : targetData.details.key
+                )
+            } else if (targetData.type === 'die' && !dieData.groupKey) {
+                createGroupHandler([dieData, targetData.details])
+            }
+        } else if (over) {
+            // Sort
+            console.log('sort')
         }
     }
 
     return (
         <div className="die-pool-container">
-            <DndContext onDragEnd={handleDragEnd}>
+            <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver}>
                 <div className="die-pool">
                     {pool.map(poolItem => {
                         if (poolItem.type === 'group') {
