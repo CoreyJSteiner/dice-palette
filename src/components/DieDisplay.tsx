@@ -1,22 +1,18 @@
 import { useDraggable, useDroppable } from "@dnd-kit/core"
 import type { Die, PoolItem } from "./DiePalleteTypes"
-import DieImage from "./DieImage"
-import type { CSSProperties } from "react"
+import DieAndValue from "./DieAndValue"
 
 type DieDisplayProps = {
     die: Die
+    poolHoverActive: boolean
     dieClickHandler?: (key: string) => void
-    fillColor?: string
-    valueFontColor?: string
 }
 
 const DieDisplay: React.FC<DieDisplayProps> = ({
     die,
+    poolHoverActive,
     dieClickHandler,
-    fillColor = 'magenta',
-    valueFontColor = 'yellow'
 }) => {
-
     // Handlers
     const handleRightClick = (e: React.MouseEvent) => {
         if (dieClickHandler) {
@@ -32,24 +28,18 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
     })
 
     const { attributes, listeners, transform, setNodeRef: setDragRef } = useDraggable({
+        // const { attributes, listeners, setNodeRef: setDragRef } = useDraggable({
         id: die.key,
-        data: die as Die
+        data: { id: die.key, type: 'die', details: die } as PoolItem
     })
     const setRefs = (node: HTMLElement | null) => {
         setDragRef(node)
         setDropRef(node)
     }
 
-    // CSS - Transform styles
-    const styleTransform = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined
-
-
-    // CSS - Vars
-    const styleValueFont: CSSProperties = {
-        '--value-font-color': valueFontColor,
-        '--value-font-border-color': fillColor,
-    } as CSSProperties
-
+    // CSS - Transform style
+    // const styleTransform = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined
+    const styleTransform = transform ? { transform: `scale(0.75)` } : undefined
 
     return (
         <button
@@ -57,12 +47,11 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
             {...listeners}
             {...attributes}
             draggable='true'
-            className='die-display'
+            className={`die-display${poolHoverActive ? ' pool-hover-active' : ''}`}
             onContextMenu={handleRightClick}
             style={styleTransform}
         >
-            <DieImage imageName={`d${die.dieSides}`} fillColor={fillColor} />
-            <h1 className="die-display-value" style={styleValueFont}>{die.dieValue}</h1>
+            <DieAndValue die={die} />
         </button >
     )
 }

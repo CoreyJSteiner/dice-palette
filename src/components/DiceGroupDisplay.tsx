@@ -5,6 +5,8 @@ import DieDisplay from "./DieDisplay"
 
 type DiceGroupDisplayProps = {
     diceGroup: DiceGroup
+    poolDragState: boolean
+    poolHoverActive: boolean
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
     destroyGroupHandler: (groupKey: string) => void
     rollDiceGroupHandler: (groupKey: string) => void
@@ -12,6 +14,8 @@ type DiceGroupDisplayProps = {
 
 const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     diceGroup,
+    poolDragState,
+    poolHoverActive,
     dieInGroupClickHandler,
     destroyGroupHandler,
     rollDiceGroupHandler
@@ -22,6 +26,13 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     const containerRef = useRef<HTMLDivElement>(null)
 
     // Effects
+    useEffect(() => {
+        // if (poolDragState) setIsExpanded(false)
+        console.log(poolDragState)
+
+    }, [poolDragState])
+
+
     useEffect(() => {
         if (isHovering && containerRef.current && !isExpanded) {
             containerRef.current.focus()
@@ -131,7 +142,11 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         <div
             ref={combinedRef}
             tabIndex={0}
-            className={`dice-group-container ${isExpanded ? 'expanded' : ''}`}
+            className={
+                `dice-group-container
+                ${isExpanded ? 'expanded' : ''}
+                ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}`
+            }
             onClick={handleContainerClick}
             onMouseEnter={() => !isExpanded && setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
@@ -166,9 +181,9 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
                     <div key={die.key} style={styleDieDisplayTransform} >
                         <DieDisplay
                             key={die.key}
+                            poolHoverActive={false}
                             die={die}
                             dieClickHandler={() => handleDieInGroupClick(die.key)}
-
                         />
                     </div>
                 ))}

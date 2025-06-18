@@ -161,35 +161,6 @@
     z-index: 1;
 }
 
-@keyframes shudder {
-    0% {
-        transform: translateY(0);
-    }
-
-    25% {
-        transform: translateY(0.2rem);
-        scale: 98%;
-    }
-
-    50% {
-        transform: translateY(0.4rem);
-        scale: 92%;
-    }
-
-    75% {
-        transform: translateY(0.2rem);
-        scale: 90%;
-    }
-
-    100% {
-        transform: translateY(0);
-    }
-}
-
-.die-button:active>* {
-    animation: shudder 0.15s linear;
-}
-
 .die-pool {
     display: flex;
     flex-direction: row;
@@ -218,10 +189,6 @@
 .die-display:hover {
     border: none;
     background: none;
-}
-
-.die-display:hover .die-fill {
-    filter: brightness(110%);
 }
 
 
@@ -376,6 +343,66 @@
     font-size: 1.35rem;
 }
 
-.pool-item-hightlight {
-    background-color: red;
+@keyframes wiggle {
+
+    0% {
+        transform: rotate(0deg);
+    }
+
+    33% {
+        transform: rotate(7deg);
+    }
+
+    66% {
+        transform: rotate(-7deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+
+}
+
+@keyframes jiggle {
+    0% {
+        transform: translateX(0) rotate(0);
+    }
+
+    15% {
+        transform: translateX(-2px) rotate(-0.5deg);
+    }
+
+    30% {
+        transform: translateX(2px) rotate(0.5deg);
+    }
+
+    45% {
+        transform: translateX(-1px) rotate(-0.3deg);
+    }
+
+    60% {
+        transform: translateX(1px) rotate(0.3deg);
+    }
+
+    75% {
+        transform: translateX(-1px) rotate(-0.2deg);
+    }
+
+    90% {
+        transform: translateX(1px) rotate(0.2deg);
+    }
+
+    100% {
+        transform: translateX(0) rotate(0);
+    }
+}
+
+.pool-hover-active {
+    animation: wiggle 0.4s ease-in-out infinite;
+}
+
+.pool-hover-active.die-display,
+.pool-hover-active.dice-group-container {
+    transform: scale(200%);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

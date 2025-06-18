@@ -123,7 +123,9 @@ const DiePallete: React.FC = () => {
         const newDie = {
             key: crypto.randomUUID(),
             dieSides: dieSides,
-            groupKey: groupKey
+            groupKey: groupKey,
+            fillColor: 'red',
+            fontColor: 'white'
         }
         if (groupKey) {
             poolAddDieToGroup(newDie, groupKey)
