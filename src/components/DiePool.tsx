@@ -6,7 +6,7 @@ import type { Die, PoolItem, PoolItemDie } from "./DiePalleteTypes"
 import {
     DndContext,
     DragOverlay,
-    pointerWithin,
+    closestCenter,
     useSensor,
     useSensors,
     MouseSensor,
@@ -143,7 +143,7 @@ const DiePool: React.FC<DiePoolProps> = ({
         <div className="die-pool-container">
             <DndContext
                 sensors={sensors}
-                collisionDetection={pointerWithin}
+                collisionDetection={closestCenter}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onDragOver={handleDragOver}
