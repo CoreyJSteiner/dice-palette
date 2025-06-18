@@ -40,9 +40,11 @@
     transition: font-size 0.1s ease-in-out;
 }
 
-.die-pallete-roll-all:hover {
-    background: rgb(0, 138, 0);
-    font-size: 1.35rem;
+@media (hover: hover) {
+    .die-pallete-roll-all:hover {
+        background: rgb(0, 138, 0);
+        font-size: 1.35rem;
+    }
 }
 
 .die-pallete-roll-all:active {
@@ -100,9 +102,11 @@
     }
 }
 
-.button-bottom:hover {
-    background-color: var(--die-pool-background-color);
-    transform: scale(108%);
+@media (hover: hover) {
+    .button-bottom:hover {
+        background-color: var(--die-pool-background-color);
+        transform: scale(108%);
+    }
 }
 
 .button-bottom:active {
@@ -121,12 +125,14 @@
     background: none;
 }
 
-.die-button:hover {
-    background: none;
-}
+@media (hover: hover) {
+    .die-button:hover {
+        background: none;
+    }
 
-.die-button:hover .die-fill {
-    filter: brightness(110%);
+    .die-button:hover .die-fill {
+        filter: brightness(110%);
+    }
 }
 
 .die-img-container {
@@ -186,9 +192,11 @@
     z-index: 1;
 }
 
-.die-display:hover {
-    border: none;
-    background: none;
+@media (hover: hover) {
+    .die-display:hover {
+        border: none;
+        background: none;
+    }
 }
 
 .dice-group-container,
@@ -277,9 +285,11 @@
     transition: all 0.2s ease;
 }
 
-.minimize-button:hover {
-    background: none;
-    transform: scale(1.2);
+@media (hover: hover) {
+    .minimize-button:hover {
+        background: none;
+        transform: scale(1.2);
+    }
 }
 
 .minimize-button:active {
@@ -333,8 +343,10 @@
     font-size: 1.4rem;
 }
 
-.dice-group-close:hover {
-    font-size: 1.45rem;
+@media (hover: hover) {
+    .dice-group-close:hover {
+        font-size: 1.45rem;
+    }
 }
 
 .dice-group-close:active {
