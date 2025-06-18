@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useDroppable } from "@dnd-kit/core"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import type { DiceGroup } from "./DiePalleteTypes"
 import DieDisplay from "./DieDisplay"
 
@@ -26,12 +27,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     const containerRef = useRef<HTMLDivElement>(null)
 
     // Effects
-    useEffect(() => {
-        // if (poolDragState) setIsExpanded(false)
-        console.log(poolDragState)
-
-    }, [poolDragState])
-
+    useEffect(() => { }, [poolDragState])
 
     useEffect(() => {
         if (isHovering && containerRef.current && !isExpanded) {
@@ -46,26 +42,17 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         }
     }, [isExpanded])
 
-    // Handlers
+    // Generic
     const displayNum = () => {
-        const diceValues = diceGroup.dice.map(die => die.dieValue ? die.dieValue : 0)
-
+        const diceValues = diceGroup.dice.map(die => die.dieValue ?? 0)
         switch (displayState) {
-            case '+':
-                return diceValues.reduce((sum, dieValue) => sum + dieValue)
-                break;
-            case 'kh':
-                return Math.max(...diceValues)
-                break;
-            case 'kl':
-                return Math.min(...diceValues)
-                break;
-            default:
-                return diceValues.reduce((sum, dieValue) => sum + dieValue)
-                break;
+            case 'kh': return Math.max(...diceValues)
+            case 'kl': return Math.min(...diceValues)
+            default: return diceValues.reduce((sum, val) => sum + val, 0)
         }
     }
 
+    // Handlers
     const handleDieInGroupClick = (dieKey: string) => {
         dieInGroupClickHandler(diceGroup.key, dieKey)
     }
@@ -89,7 +76,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.repeat) return
-        const handleSpaceDown = () => {
+        const cycleDisplayState = () => {
             e.preventDefault()
             setDisplayState(prev => {
                 switch (prev) {
@@ -101,17 +88,21 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
             })
         }
 
-        const handleDelete = () => {
+        const destroyGroupSelf = () => {
             e.preventDefault()
             destroyGroupHandler(diceGroup.key)
         }
 
-        if (e.code === 'Space') handleSpaceDown()
-        if (e.code === 'Backspace' || e.code === 'Delete') handleDelete()
+        if (e.code === 'Backspace' || e.code === 'Delete') destroyGroupSelf()
+        if (e.code === 'Space') cycleDisplayState()
     }
 
-    // Drag Ref
-    const { setNodeRef } = useDroppable({
+    // DnD Kit
+    const {
+        setNodeRef,
+        transform,
+        transition
+    } = useSortable({
         id: diceGroup.key,
         data: { type: 'group', details: diceGroup }
     })
@@ -122,63 +113,52 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }
 
     // CSS - Transform Styles
-    const styleDieDisplayTransform = {
-        transform: isExpanded ? 'scale(1.2)' : 'scale(1)',
-        transition: 'transform 0.3s ease',
+    const containerStyle = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        boxShadow: isHovering && !isExpanded ? '0 0 10px rgba(0, 0, 0, 0.2)' : 'none',
+        transformOrigin: 'center'
     }
 
     const styleDieGroupTransform = {
-        transition: 'all 0.3s ease',
-        transform: isHovering && !isExpanded ? 'scale(1.05)' : 'scale(1)',
-        boxShadow: isHovering && !isExpanded ? '0 0 10px rgba(0, 0, 0, 0.2)' : 'none'
+        transform: isExpanded ? 'scale(1.2)' : 'scale(1)',
+        transition: 'transform 0.3s ease'
     }
 
     const styleDiceContentTransform = {
-        padding: isExpanded ? '1.5rem' : '0',
-        transition: 'all 0.3s ease',
+        padding: isExpanded ? '1.5rem' : '0', transition: 'all 0.3s ease'
     }
 
     return (
         <div
             ref={combinedRef}
             tabIndex={0}
-            className={
-                `dice-group-container
-                ${isExpanded ? 'expanded' : ''}
-                ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}`
-            }
+            className={`dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}`}
             onClick={handleContainerClick}
             onMouseEnter={() => !isExpanded && setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             onKeyDown={handleKeyDown}
-            style={styleDieGroupTransform}
+            style={containerStyle}
         >
             {isExpanded && (
                 <div>
                     <h1 className='dice-group-expand-display'>{displayNum()}</h1>
-                    <button
-                        className="minimize-button"
-                        onClick={handleMinimizeClick}
-                    >
-                        <span className='material-symbols-outlined dice-group-close'>close</span>
+                    <button className="minimize-button" onClick={handleMinimizeClick}>
+                        <span className='material-symbols-outlined dice-group-close'>collapse_content</span>
                     </button>
                 </div>
             )}
 
             {!isExpanded && (
-                <div
-                    className="dice-group-collapse-cover"
-                    onContextMenu={handleRightClickOnCollapse}
-                >
+                <div className="dice-group-collapse-cover" onContextMenu={handleRightClickOnCollapse}>
                     <h1 className='dice-group-collapse-display'>{displayNum()}</h1>
                     <p className='dice-group-collapse-display-state'>{displayState}</p>
                 </div>
-            )
-            }
+            )}
 
             <div className="dice-content" style={styleDiceContentTransform}>
                 {diceGroup.dice.map(die => (
-                    <div key={die.key} style={styleDieDisplayTransform} >
+                    <div key={die.key} style={styleDieGroupTransform}>
                         <DieDisplay
                             key={die.key}
                             poolHoverActive={false}
@@ -188,7 +168,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
                     </div>
                 ))}
             </div>
-        </div >
+        </div>
     )
 }
 

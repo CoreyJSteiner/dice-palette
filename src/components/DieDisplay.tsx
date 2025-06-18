@@ -1,4 +1,5 @@
-import { useDraggable, useDroppable } from "@dnd-kit/core"
+import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import type { Die, PoolItem } from "./DiePalleteTypes"
 import DieAndValue from "./DieAndValue"
 
@@ -13,6 +14,7 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
     poolHoverActive,
     dieClickHandler,
 }) => {
+
     // Handlers
     const handleRightClick = (e: React.MouseEvent) => {
         if (dieClickHandler) {
@@ -21,29 +23,31 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
         }
     }
 
-    // Drag Ref
-    const { setNodeRef: setDropRef } = useDroppable({
-        id: die.key,
-        data: { id: die.key, type: 'die', details: die } as PoolItem
-    })
 
-    const { attributes, listeners, transform, setNodeRef: setDragRef } = useDraggable({
-        // const { attributes, listeners, setNodeRef: setDragRef } = useDraggable({
+    // DnD Kit
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging
+    } = useSortable({
         id: die.key,
-        data: { id: die.key, type: 'die', details: die } as PoolItem
+        data: { id: die.key, type: 'die', details: die } as PoolItem,
+        animateLayoutChanges: defaultAnimateLayoutChanges
     })
-    const setRefs = (node: HTMLElement | null) => {
-        setDragRef(node)
-        setDropRef(node)
-    }
 
     // CSS - Transform style
-    // const styleTransform = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined
-    const styleTransform = transform ? { transform: `scale(0.75)` } : undefined
+    const styleTransform = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    }
 
     return (
         <button
-            ref={setRefs}
+            ref={setNodeRef}
             {...listeners}
             {...attributes}
             draggable='true'
@@ -52,7 +56,7 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
             style={styleTransform}
         >
             <DieAndValue die={die} />
-        </button >
+        </button>
     )
 }
 

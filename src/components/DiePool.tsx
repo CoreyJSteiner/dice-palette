@@ -1,15 +1,28 @@
+// --- DiePool.tsx ---
 import type React from "react"
 import DieDisplay from "./DieDisplay"
 import DiceGroupDisplay from "./DiceGroupDisplay"
 import type { Die, PoolItem, PoolItemDie } from "./DiePalleteTypes"
-import { DndContext, DragOverlay, pointerWithin, useSensor, useSensors, MouseSensor, TouchSensor } from "@dnd-kit/core"
-import type { DragOverEvent, DragEndEvent, DragStartEvent } from "@dnd-kit/core"
+import {
+    DndContext,
+    DragOverlay,
+    pointerWithin,
+    useSensor,
+    useSensors,
+    MouseSensor,
+    TouchSensor,
+    type DragStartEvent,
+    type DragOverEvent,
+    type DragEndEvent
+} from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { useState, useRef } from "react"
 import { snapCenterToCursor } from "@dnd-kit/modifiers"
 import DieAndValue from "./DieAndValue"
 
 type DiePoolProps = {
     pool: PoolItem[]
+    setPool: (newPool: React.SetStateAction<PoolItem[]>) => void
     dieClickHandler: (key: string) => void
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
     clearClickHandler: () => void
@@ -22,6 +35,7 @@ type DiePoolProps = {
 
 const DiePool: React.FC<DiePoolProps> = ({
     pool = [],
+    setPool,
     clearClickHandler,
     resetClickHandler,
     dieClickHandler,
@@ -34,20 +48,13 @@ const DiePool: React.FC<DiePoolProps> = ({
     const [nestingTargetKey, setNestingTargetKey] = useState<string>('')
     const [activePoolItem, setActivePoolItem] = useState<PoolItemDie | null>(null)
     const hoverTimeout = useRef<number>(undefined)
-
     const mouseSensor = useSensor(MouseSensor)
     const touchSensor = useSensor(TouchSensor)
-
-    const sensors = useSensors(
-        mouseSensor,
-        touchSensor,
-    )
+    const sensors = useSensors(mouseSensor, touchSensor)
 
     // Handlers
     const handleDragStart = (e: DragStartEvent) => {
-        console.log('dragstart')
-        setActivePoolItem(e.active.data.current ? e.active.data.current as PoolItemDie : null)
-
+        setActivePoolItem(e.active.data.current as PoolItemDie || null)
         setNestingTargetKey('')
         clearTimeout(hoverTimeout.current)
     }
@@ -55,8 +62,8 @@ const DiePool: React.FC<DiePoolProps> = ({
     const handleDragOver = (e: DragOverEvent) => {
         if (!e.over) return
         const { active, over } = e
-        const activeItemKey: string = active.id as string
-        const hoverItemKey: string = over.id as string
+        const activeItemKey = active.id as string
+        const hoverItemKey = over.id as string
         if (hoverItemKey !== nestingTargetKey) {
             clearTimeout(hoverTimeout.current)
             hoverTimeout.current = setTimeout(() => {
@@ -70,10 +77,7 @@ const DiePool: React.FC<DiePoolProps> = ({
     }
 
     const handleDragEnd = (e: DragEndEvent) => {
-        console.log('dragend')
-
         setActivePoolItem(null)
-
         clearTimeout(hoverTimeout.current)
         const { active, over } = e
         const dieData = active.data.current?.details as Die
@@ -95,12 +99,25 @@ const DiePool: React.FC<DiePoolProps> = ({
             } else if (targetData.type === 'die' && !dieData.groupKey) {
                 createGroupHandler([dieData, targetData.details])
             }
-        } else if (over) {
-            // Sort
-            console.log('sort')
+        } else if (over && active.id !== over.id) {
+            setPool((prevPool: PoolItem[]): PoolItem[] => {
+                const oldIndex: number = prevPool.findIndex((item: PoolItem) => item.id === active.id)
+                const newIndex: number = prevPool.findIndex((item: PoolItem) => item.id === over.id)
+
+                if (oldIndex < 0 || newIndex < 0) {
+                    return prevPool
+                }
+
+                const updated: PoolItem[] = [...prevPool]
+                const [movedItem] = updated.splice(oldIndex, 1)
+                updated.splice(newIndex, 0, movedItem)
+
+                return updated
+            })
         }
     }
 
+    // Pool Item Element
     const poolItemDisplay = (poolItem: PoolItem) => {
         if (poolItem.type === 'group') {
             return <DiceGroupDisplay
@@ -132,29 +149,21 @@ const DiePool: React.FC<DiePoolProps> = ({
                 onDragOver={handleDragOver}
                 onDragCancel={() => clearTimeout(hoverTimeout.current)}
             >
-                <div className="die-pool">
-                    {pool.map(poolItem => {
-                        return poolItemDisplay(poolItem)
-                    })}
-                </div>
+                <SortableContext
+                    items={pool.map(item => item.id)}
+                    strategy={verticalListSortingStrategy}
+                >
+                    <div className="die-pool">
+                        {pool.map(poolItem => poolItemDisplay(poolItem))}
+                    </div>
+                </SortableContext>
 
                 <div className="button-bottom-container">
                     <button className="button-bottom" onClick={resetClickHandler}>Reset Dice</button>
                     <button className="button-bottom" onClick={clearClickHandler}>Clear Palette</button>
                 </div>
 
-                <DragOverlay
-                    modifiers={[snapCenterToCursor]}
-                    dropAnimation={null}
-                // dropAnimation={{
-                //     duration: 200,
-                //     easing: 'ease-out',
-                //     keyframes: () => [
-                //         { transform: 'scale(0.75)' },
-                //         { transform: 'scale(1)' },
-                //     ],
-                // }}
-                >
+                <DragOverlay modifiers={[snapCenterToCursor]} dropAnimation={null}>
                     {activePoolItem ? (
                         <div className='die-display'>
                             <DieAndValue die={activePoolItem.details} />
@@ -162,7 +171,7 @@ const DiePool: React.FC<DiePoolProps> = ({
                     ) : null}
                 </DragOverlay>
             </DndContext>
-        </div >
+        </div>
     )
 }
 

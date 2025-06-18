@@ -41,7 +41,6 @@ button:hover {
 
 button:active {
   transform: scale(95%);
-  /* transition: scale 0.5s ease-out; */
 }
 
 img {

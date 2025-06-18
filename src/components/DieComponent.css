@@ -191,7 +191,6 @@
     background: none;
 }
 
-
 .dice-group-container,
 .die-display {
     padding: 0;
@@ -213,7 +212,6 @@
     z-index: 2;
 }
 
-/* Updated dice group container */
 .dice-group-container {
     position: relative;
     display: flex;
