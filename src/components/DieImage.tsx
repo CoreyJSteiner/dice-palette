@@ -22,7 +22,11 @@ const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20', fillColor = 'red
 
     return (
         <div className='die-img-container' style={styleFill}>
-            <img draggable='false' className='die-img' src={IMG_BASE_PATH + imageName + '.png'} />
+            <img
+                draggable='false'
+                className='die-img'
+                src={IMG_BASE_PATH + imageName + '.png'
+                } />
             <div
                 className='die-fill'
                 style={maskStyle}
