@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useSortable } from "@dnd-kit/sortable"
 // import { CSS } from "@dnd-kit/utilities"
-import type { DiceGroup } from "./DiePalleteTypes"
+import type { PoolItem, DiceGroup } from "./DiePalleteTypes"
 import DieDisplay from "./DieDisplay"
 
 type DiceGroupDisplayProps = {
@@ -71,6 +71,11 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         setIsExpanded(false)
     }
 
+    // const handleExpandClick = (e: React.MouseEvent) => {
+    //     e.stopPropagation()
+    //     setIsExpanded(true)
+    // }
+
     const handleRightClickOnCollapse = (e: React.MouseEvent) => {
         e.preventDefault()
         rollDiceGroupHandler(diceGroup.key)
@@ -100,27 +105,45 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }
 
     // DnD Kit
+    // const {
+    //     setNodeRef,
+    //     // transform,
+    //     // transition
+    // } = useSortable({
+    //     id: diceGroup.key,
+    //     data: { type: 'group', details: diceGroup }
+    // })
+
+    // const combinedRef = (node: HTMLDivElement | null) => {
+    //     setNodeRef(node)
+    //     containerRef.current = node
+    // }
+
+
     const {
+        attributes,
+        listeners,
         setNodeRef,
         // transform,
-        // transition
+        // transition,
+        isDragging
     } = useSortable({
         id: diceGroup.key,
-        data: { type: 'group', details: diceGroup }
+        data: {
+            type: 'group',
+            details: diceGroup
+        } as PoolItem,
+        // animateLayoutChanges: defaultAnimateLayoutChanges
     })
 
-    const combinedRef = (node: HTMLDivElement | null) => {
-        setNodeRef(node)
-        containerRef.current = node
-    }
-
     // CSS - Transform Styles
-    // const containerStyle = {
-    //     transform: CSS.Transform.toString(transform),
-    //     transition,
-    //     boxShadow: isHovering && !isExpanded ? '0 0 10px rgba(0, 0, 0, 0.2)' : 'none',
-    //     transformOrigin: 'center'
-    // }
+    const containerStyle = {
+        opacity: isDragging ? 0 : 1,
+        //     transform: CSS.Transform.toString(transform),
+        //     transition,
+        //     boxShadow: isHovering && !isExpanded ? '0 0 10px rgba(0, 0, 0, 0.2)' : 'none',
+        //     transformOrigin: 'center'
+    }
 
     const styleDieGroupTransform = {
         transform: isExpanded ? 'scale(1.2)' : 'scale(1)',
@@ -133,7 +156,8 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
 
     return (
         <div
-            ref={combinedRef}
+            ref={setNodeRef}
+            // ref={combinedRef}
             tabIndex={0}
             className={
                 `dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}${poolHoverCenter ? ' pool-hover-center' : ''}`
@@ -142,7 +166,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
             onMouseEnter={() => !isExpanded && setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             onKeyDown={handleKeyDown}
-        // style={containerStyle}
+            style={containerStyle}
         >
             {isExpanded && (
                 <div>
@@ -156,6 +180,15 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
             {!isExpanded && (
                 <div className="dice-group-collapse-cover" onContextMenu={handleRightClickOnCollapse}>
                     <h1 className='dice-group-collapse-display'>{displayNum()}</h1>
+                    {/* <button className="dice-group-collapse-expand-button" onClick={handleExpandClick}>
+                        <span className='material-symbols-outlined dice-group-close'>expand_content</span>
+                    </button> */}
+
+                    <span
+                        {...listeners}
+                        {...attributes}
+                        className='material-symbols-outlined dice-group-collapse-drag-handle'>drag_indicator</span>
+
                     <p className='dice-group-collapse-display-state'>{displayState}</p>
                 </div>
             )}

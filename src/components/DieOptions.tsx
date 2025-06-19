@@ -8,7 +8,7 @@ type DieOptionsProps = {
 
 const DieOptions: React.FC<DieOptionsProps> = ({ onAddDie }) => {
     const [isHovering, setIsHovering] = useState(false)
-    const [addGroup, setAddGroup] = useState<string | null>(null)
+    const [addGroup, setAddGroup] = useState<string | null>('')
     const containerRef = useRef<HTMLDivElement>(null)
 
     // Effects

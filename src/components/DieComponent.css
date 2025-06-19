@@ -267,16 +267,17 @@
     transition: all 0.3s ease;
 }
 
-.minimize-button {
+.minimize-button,
+.dice-group-collapse-expand-button,
+.dice-group-collapse-drag-handle {
     position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
     background: none;
     border: none;
     border-radius: 0;
     width: 1.5rem;
     height: 1.5rem;
     padding: 0;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -285,14 +286,34 @@
     transition: all 0.2s ease;
 }
 
+.minimize-button {
+    top: 0.5rem;
+    right: 0.5rem;
+}
+
+.dice-group-collapse-drag-handle {
+    top: 0;
+    right: 0;
+    font-size: 0.8rem;
+}
+
+.dice-group-collapse-expand-button {
+    top: 0;
+    right: 0;
+}
+
 @media (hover: hover) {
-    .minimize-button:hover {
+
+    .minimize-button:hover,
+    .dice-group-collapse-expand-button:hover,
+    .dice-group-collapse-drag-handle:hover {
         background: none;
-        transform: scale(1.2);
+        transform: scale(105%);
     }
 }
 
-.minimize-button:active {
+.minimize-button:active,
+.dice-group-collapse-expand-button:active {
     background: none;
     transform: scale(0.9);
 }

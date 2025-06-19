@@ -49,7 +49,7 @@ const DiePool: React.FC<DiePoolProps> = ({
 }) => {
     const [nestingTargetZone, setNestingTargetZone] = useState<'center' | 'margin' | null>(null)
     const [nestingTargetKey, setNestingTargetKey] = useState<string>('')
-    const [activePoolItem, setActivePoolItem] = useState<PoolItemDie | null>(null)
+    const [activePoolItem, setActivePoolItem] = useState<PoolItem | null>(null)
     const hoverTimeout = useRef<number>(undefined)
     const mouseSensor = useSensor(MouseSensor)
     const touchSensor = useSensor(TouchSensor)
@@ -82,7 +82,7 @@ const DiePool: React.FC<DiePoolProps> = ({
 
         clearTimeout(hoverTimeout.current)
 
-        if (collisionSet.has('center')) {
+        if (collisionSet.has('center') && active.data.current?.type !== 'group') {
             hoverTimeout.current = setTimeout(() => {
                 setNestingTargetKey(over.id as string)
                 setNestingTargetZone('center')
@@ -94,10 +94,6 @@ const DiePool: React.FC<DiePoolProps> = ({
     }
 
     const handleGrouping = (dieData: Die, targetData: PoolItem | null) => {
-        console.dir({
-            dieData,
-            targetData
-        })
         if (nestingTargetKey === 'clear') addToGroupHandler(dieData, null)
 
         setNestingTargetKey('')
@@ -141,9 +137,7 @@ const DiePool: React.FC<DiePoolProps> = ({
         })
 
         if (over && active.id !== over.id) {
-            if (nestingTargetZone === 'center') {
-                handleGrouping(dieData, targetData)
-            } else if (nestingTargetZone === 'margin') {
+            if (nestingTargetZone === 'margin') {
                 setPool((prevPool: PoolItem[]): PoolItem[] => {
                     const oldIndex = prevPool.findIndex(item => item.id === active.id)
                     const newIndex = prevPool.findIndex(item => item.id === over.id)
@@ -156,6 +150,8 @@ const DiePool: React.FC<DiePoolProps> = ({
 
                     return updated
                 })
+            } else if (nestingTargetZone === 'center') {
+                handleGrouping(dieData, targetData)
             }
         } else if (active.id === targetData.id && active.data.current?.details.groupKey) {
             handleGrouping(dieData, null)
@@ -229,9 +225,20 @@ const DiePool: React.FC<DiePoolProps> = ({
 
                 <DragOverlay modifiers={[snapCenterToCursor]} dropAnimation={null}>
                     {activePoolItem ? (
-                        <div className='die-display' style={{ opacity: '0.5' }}>
-                            <DieAndValue die={activePoolItem.details} />
-                        </div>
+                        activePoolItem.type === 'die' ?
+                            <div className='die-display' style={{ opacity: '0.5' }}>
+                                <DieAndValue die={activePoolItem.details} />
+                            </div> :
+                            <div className="dice-group-container">
+                                <div className="dice-group-collapse-cover">
+                                    <h1 className='dice-group-collapse-display'>{
+                                        activePoolItem.details.dice.reduce((sum, die) => {
+                                            const val = die.dieValue ? die.dieValue : 0
+                                            return sum + val
+                                        }, 0)
+                                    }</h1>
+                                </div>
+                            </div>
                     ) : null}
                 </DragOverlay>
             </DndContext>
