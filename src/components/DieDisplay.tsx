@@ -1,17 +1,19 @@
 import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+// import { CSS } from "@dnd-kit/utilities"
 import type { Die, PoolItem } from "./DiePalleteTypes"
 import DieAndValue from "./DieAndValue"
 
 type DieDisplayProps = {
     die: Die
     poolHoverActive: boolean
+    poolHoverCenter?: boolean
     dieClickHandler?: (key: string) => void
 }
 
 const DieDisplay: React.FC<DieDisplayProps> = ({
     die,
     poolHoverActive,
+    poolHoverCenter,
     dieClickHandler,
 }) => {
 
@@ -29,8 +31,8 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
         attributes,
         listeners,
         setNodeRef,
-        transform,
-        transition,
+        // transform,
+        // transition,
         isDragging
     } = useSortable({
         id: die.key,
@@ -40,9 +42,11 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
 
     // CSS - Transform style
     const styleTransform = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
+        // transform: CSS.Transform.toString(transform),
+        // transition,
+        opacity: isDragging ? 0 : 1,
+        // opacity: 0
+        // display: 'none'
     }
 
     return (
@@ -51,7 +55,8 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
             {...listeners}
             {...attributes}
             draggable='true'
-            className={`die-display${poolHoverActive ? ' pool-hover-active' : ''}`}
+            data-id={die.key}
+            className={`die-display${poolHoverActive ? ' pool-hover-active' : ''}${poolHoverCenter ? ' pool-hover-center' : ''}`}
             onContextMenu={handleRightClick}
             style={styleTransform}
         >

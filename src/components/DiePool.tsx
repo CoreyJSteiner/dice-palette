@@ -1,13 +1,14 @@
-// --- DiePool.tsx ---
 import type React from "react"
 import DieDisplay from "./DieDisplay"
 import DiceGroupDisplay from "./DiceGroupDisplay"
+import { zoneCollisionDetection } from '../utils/ZoneCollisionDetection'
 import type { Die, PoolItem, PoolItemDie } from "./DiePalleteTypes"
 import {
     DndContext,
     DragOverlay,
     // closestCenter,
-    pointerWithin,
+    closestCorners,
+    // pointerWithin,
     useSensor,
     useSensors,
     MouseSensor,
@@ -16,7 +17,7 @@ import {
     type DragOverEvent,
     type DragEndEvent
 } from "@dnd-kit/core"
-import { horizontalListSortingStrategy, rectSortingStrategy, SortableContext } from "@dnd-kit/sortable"
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable"
 import { useState, useRef } from "react"
 import { snapCenterToCursor } from "@dnd-kit/modifiers"
 import DieAndValue from "./DieAndValue"
@@ -46,6 +47,7 @@ const DiePool: React.FC<DiePoolProps> = ({
     destroyGroupHandler,
     rollDiceGroupHandler
 }) => {
+    const [nestingTargetZone, setNestingTargetZone] = useState<'center' | 'margin' | null>(null)
     const [nestingTargetKey, setNestingTargetKey] = useState<string>('')
     const [activePoolItem, setActivePoolItem] = useState<PoolItemDie | null>(null)
     const hoverTimeout = useRef<number>(undefined)
@@ -59,23 +61,35 @@ const DiePool: React.FC<DiePoolProps> = ({
         setNestingTargetKey('')
         clearTimeout(hoverTimeout.current)
     }
+    // Update handleDragOver to set the zone
+    const handleDragMove = (e: DragOverEvent) => {
+        const { active, over, collisions } = e
 
-    const handleDragOver = (e: DragOverEvent) => {
-        const { active, over } = e
+        if (!over || !collisions || over.id === active.id) return
 
-        const activeItemKey = active.id as string
-        const hoverItemKey = over ? over.id as string : 'clear'
+        // Find collision zone for the over item
+        const collisionSet = collisions.reduce((acc, c) => {
+            if (c.id === over.id && c.data?.zone) {
+                acc.add(c.data?.zone)
+            } else {
+                acc.add('default')
+            }
+            return acc
+        }, new Set())
 
-        console.log(hoverItemKey)
-        if (hoverItemKey !== nestingTargetKey) {
-            clearTimeout(hoverTimeout.current)
+        // const zone = collision?.data?.zone || 'margin'
+        console.log(collisionSet)
+
+        clearTimeout(hoverTimeout.current)
+
+        if (collisionSet.has('center')) {
             hoverTimeout.current = setTimeout(() => {
-                if (hoverItemKey !== activeItemKey) {
-                    setNestingTargetKey(hoverItemKey)
-                } else {
-                    setNestingTargetKey('')
-                }
-            }, 800)
+                setNestingTargetKey(over.id as string)
+                setNestingTargetZone('center')
+            }, 500) as unknown as number
+        } else if (collisionSet.has('default')) {
+            setNestingTargetKey(over.id as string)
+            setNestingTargetZone('margin')
         }
     }
 
@@ -104,40 +118,64 @@ const DiePool: React.FC<DiePoolProps> = ({
     }
 
     const handleDragEnd = (e: DragEndEvent) => {
-        console.log(nestingTargetKey)
         setActivePoolItem(null)
         clearTimeout(hoverTimeout.current)
         const { active, over } = e
-        const dieData = active.data.current?.details as Die
-        const targetData: PoolItem | null = over ? over.data.current as PoolItem : null
 
-        if (nestingTargetKey) {
-            handleGrouping(dieData, targetData)
-        } else if (over && active.id !== over.id) {
-            setPool((prevPool: PoolItem[]): PoolItem[] => {
-                const oldIndex: number = prevPool.findIndex((item: PoolItem) => item.id === active.id)
-                const newIndex: number = prevPool.findIndex((item: PoolItem) => item.id === over.id)
-
-                if (oldIndex < 0 || newIndex < 0) {
-                    return prevPool
-                }
-
-                const updated: PoolItem[] = [...prevPool]
-                const [movedItem] = updated.splice(oldIndex, 1)
-                updated.splice(newIndex, 0, movedItem)
-
-                return updated
-            })
+        const reset = () => {
+            setNestingTargetKey('')
+            setNestingTargetZone(null)
         }
+
+        if (!active || !over) {
+            reset()
+            return
+        }
+
+        const dieData = active.data.current?.details as Die
+        const targetData: PoolItem | null = over?.data.current as PoolItem
+
+        console.dir({
+            dieData,
+            targetData
+        })
+
+        if (over && active.id !== over.id) {
+            if (nestingTargetZone === 'center') {
+                handleGrouping(dieData, targetData)
+            } else if (nestingTargetZone === 'margin') {
+                setPool((prevPool: PoolItem[]): PoolItem[] => {
+                    const oldIndex = prevPool.findIndex(item => item.id === active.id)
+                    const newIndex = prevPool.findIndex(item => item.id === over.id)
+
+                    if (oldIndex === -1 || newIndex === -1) return prevPool
+
+                    const updated = [...prevPool]
+                    const [movedItem] = updated.splice(oldIndex, 1)
+                    updated.splice(newIndex, 0, movedItem)
+
+                    return updated
+                })
+            }
+        } else if (active.id === targetData.id && active.data.current?.details.groupKey) {
+            handleGrouping(dieData, null)
+        }
+
+        reset()
     }
 
     // Pool Item Element
     const poolItemDisplay = (poolItem: PoolItem) => {
+        const isActive = nestingTargetKey === poolItem.id
+        const isCenter = nestingTargetZone === 'center'
+        const isMargin = nestingTargetZone === 'margin'
+
         if (poolItem.type === 'group') {
             return <DiceGroupDisplay
                 key={poolItem.details.key}
                 poolDragState={nestingTargetKey !== ''}
-                poolHoverActive={nestingTargetKey === poolItem.id}
+                poolHoverActive={isActive && isMargin}
+                poolHoverCenter={isActive && isCenter}
                 diceGroup={poolItem.details}
                 dieInGroupClickHandler={dieInGroupClickHandler}
                 destroyGroupHandler={destroyGroupHandler}
@@ -146,7 +184,8 @@ const DiePool: React.FC<DiePoolProps> = ({
         } else {
             return <DieDisplay
                 key={poolItem.details.key}
-                poolHoverActive={nestingTargetKey === poolItem.id}
+                poolHoverActive={isActive && isMargin}
+                poolHoverCenter={isActive && isCenter}
                 die={poolItem.details}
                 dieClickHandler={dieClickHandler}
             />
@@ -157,16 +196,26 @@ const DiePool: React.FC<DiePoolProps> = ({
         <div className="die-pool-container">
             <DndContext
                 sensors={sensors}
-                // collisionDetection={closestCenter}
-                collisionDetection={pointerWithin}
+                // collisionDetection={zoneCollisionDetection}
+                collisionDetection={(args) => {
+                    const cornerCollisions = closestCorners(args)
+                    const zoneCollisions = zoneCollisionDetection(args)
+
+                    return [...cornerCollisions, ...zoneCollisions]
+                }}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
-                onDragCancel={() => clearTimeout(hoverTimeout.current)}
+                // onDragOver={handleDragOver}
+                onDragMove={handleDragMove}
+                onDragCancel={() => {
+                    clearTimeout(hoverTimeout.current)
+                    setNestingTargetKey('')
+                    setNestingTargetZone(null)
+                }}
             >
                 <SortableContext
                     items={pool.map(item => item.id)}
-                    strategy={rectSortingStrategy}
+                    strategy={horizontalListSortingStrategy}
                 >
                     <div className="die-pool">
                         {pool.map(poolItem => poolItemDisplay(poolItem))}
@@ -180,7 +229,7 @@ const DiePool: React.FC<DiePoolProps> = ({
 
                 <DragOverlay modifiers={[snapCenterToCursor]} dropAnimation={null}>
                     {activePoolItem ? (
-                        <div className='die-display'>
+                        <div className='die-display' style={{ opacity: '0.5' }}>
                             <DieAndValue die={activePoolItem.details} />
                         </div>
                     ) : null}

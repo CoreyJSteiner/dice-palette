@@ -407,12 +407,44 @@
     }
 }
 
+/* .pool-hover-active {
+    animation: wiggle 0.3s ease-in-out infinite;
+} */
+
+/* .pool-hover-active.die-display,
+.pool-hover-active.dice-group-container {
+    transform: scale(200%);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+} */
+
+
+/* Test */
+/* Center zone animation */
+@keyframes center-pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pool-hover-center {
+    animation: center-pulse 1s ease-in-out infinite;
+    z-index: 10;
+}
+
+/* Margin zone animation */
 .pool-hover-active {
-    animation: wiggle 0.2s ease-in-out infinite;
+    animation: wiggle 0.3s ease-in-out infinite;
 }
 
 .pool-hover-active.die-display,
 .pool-hover-active.dice-group-container {
-    transform: scale(200%);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
