@@ -82,6 +82,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
+        console.log('oy')
         if (e.repeat) return
         const cycleDisplayState = () => {
             e.preventDefault()
@@ -114,12 +115,6 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     //     data: { type: 'group', details: diceGroup }
     // })
 
-    // const combinedRef = (node: HTMLDivElement | null) => {
-    //     setNodeRef(node)
-    //     containerRef.current = node
-    // }
-
-
     const {
         attributes,
         listeners,
@@ -135,6 +130,11 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         } as PoolItem,
         // animateLayoutChanges: defaultAnimateLayoutChanges
     })
+
+    const combinedRef = (node: HTMLDivElement | null) => {
+        setNodeRef(node)
+        containerRef.current = node
+    }
 
     // CSS - Transform Styles
     const containerStyle = {
@@ -156,8 +156,8 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
 
     return (
         <div
-            ref={setNodeRef}
-            // ref={combinedRef}
+            // ref={setNodeRef}
+            ref={combinedRef}
             tabIndex={0}
             className={
                 `dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}${poolHoverCenter ? ' pool-hover-center' : ''}`

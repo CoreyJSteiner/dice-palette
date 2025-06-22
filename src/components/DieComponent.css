@@ -7,6 +7,7 @@
     -ms-user-select: none;
     /* Standard */
     user-select: none;
+    outline: none;
 }
 
 :root {
@@ -294,6 +295,7 @@
 .dice-group-collapse-drag-handle {
     top: 0;
     right: 0;
+    color: #414141;
     font-size: 0.8rem;
 }
 
@@ -327,6 +329,11 @@
     width: 100%;
     height: 100%;
     color: white;
+    container-type: size;
+}
+
+.dice-group-collapse-display {
+    font-size: 2rem;
 }
 
 .dice-group-collapse-display-state {
