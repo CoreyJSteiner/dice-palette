@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useSortable } from "@dnd-kit/sortable"
 // import { CSS } from "@dnd-kit/utilities"
 import type { PoolItem, DiceGroup } from "./DiePalleteTypes"
@@ -27,6 +27,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     const [isHovering, setIsHovering] = useState(false)
     const [displayState, setDisplayState] = useState('+')
     const containerRef = useRef<HTMLDivElement>(null)
+    const collapseDisplayRef = useRef<HTMLHeadingElement>(null)
 
     // Effects
     useEffect(() => { }, [poolDragState])
@@ -45,14 +46,22 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }, [isExpanded])
 
     // Generic
-    const displayNum = () => {
+    const displayNum = useCallback(() => {
         const diceValues = diceGroup.dice.map(die => die.dieValue ?? 0)
         switch (displayState) {
             case 'kh': return Math.max(...diceValues)
             case 'kl': return Math.min(...diceValues)
             default: return diceValues.reduce((sum, val) => sum + val, 0)
         }
-    }
+    }, [displayState, diceGroup.dice])
+
+    useEffect(() => {
+        console.log(collapseDisplayRef)
+        // collapseDisplayRef.style
+        // this is inteded to updat eteh font size in a future updata so that the displayed result always fits
+        // the container
+
+    }, [displayNum])
 
     // Handlers
     const handleDieInGroupClick = (dieKey: string) => {
@@ -174,12 +183,18 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
                     <button className="minimize-button" onClick={handleMinimizeClick}>
                         <span className='material-symbols-outlined dice-group-close'>collapse_content</span>
                     </button>
+                    <p className='dice-group-collapse-display-state'>{displayState}</p>
                 </div>
             )}
 
             {!isExpanded && (
                 <div className="dice-group-collapse-cover" onContextMenu={handleRightClickOnCollapse}>
-                    <h1 className='dice-group-collapse-display'>{displayNum()}</h1>
+                    <h1
+                        ref={collapseDisplayRef}
+                        className='dice-group-collapse-display'
+                    >
+                        {displayNum()}
+                    </h1>
                     {/* <button className="dice-group-collapse-expand-button" onClick={handleExpandClick}>
                         <span className='material-symbols-outlined dice-group-close'>expand_content</span>
                     </button> */}

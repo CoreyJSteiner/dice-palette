@@ -6,9 +6,7 @@ import type { Die, PoolItem, PoolItemDie } from "./DiePalleteTypes"
 import {
     DndContext,
     DragOverlay,
-    // closestCenter,
     closestCorners,
-    // pointerWithin,
     useSensor,
     useSensors,
     MouseSensor,
@@ -61,13 +59,12 @@ const DiePool: React.FC<DiePoolProps> = ({
         setNestingTargetKey('')
         clearTimeout(hoverTimeout.current)
     }
-    // Update handleDragOver to set the zone
+
     const handleDragMove = (e: DragOverEvent) => {
         const { active, over, collisions } = e
 
         if (!over || !collisions || over.id === active.id) return
 
-        // Find collision zone for the over item
         const collisionSet = collisions.reduce((acc, c) => {
             if (c.id === over.id && c.data?.zone) {
                 acc.add(c.data?.zone)
@@ -77,12 +74,14 @@ const DiePool: React.FC<DiePoolProps> = ({
             return acc
         }, new Set())
 
-        // const zone = collision?.data?.zone || 'margin'
         console.log(collisionSet)
 
         clearTimeout(hoverTimeout.current)
 
-        if (collisionSet.has('center') && active.data.current?.type !== 'group') {
+        const activeData = active.data.current
+        if (activeData?.details.groupKey) return
+
+        if (collisionSet.has('center') && activeData?.type === 'die') {
             hoverTimeout.current = setTimeout(() => {
                 setNestingTargetKey(over.id as string)
                 setNestingTargetZone('center')
@@ -123,7 +122,7 @@ const DiePool: React.FC<DiePoolProps> = ({
             setNestingTargetZone(null)
         }
 
-        if (!active || !over) {
+        if (!active) {
             reset()
             return
         }
@@ -136,24 +135,34 @@ const DiePool: React.FC<DiePoolProps> = ({
             targetData
         })
 
-        if (over && active.id !== over.id) {
+        console.log('still here');
+
+
+        if (over && active.id !== over.id && !dieData.groupKey) {
             if (nestingTargetZone === 'margin') {
-                setPool((prevPool: PoolItem[]): PoolItem[] => {
-                    const oldIndex = prevPool.findIndex(item => item.id === active.id)
-                    const newIndex = prevPool.findIndex(item => item.id === over.id)
+                if (!dieData.groupKey) {
+                    setPool((prevPool: PoolItem[]): PoolItem[] => {
+                        const oldIndex = prevPool.findIndex(item => item.id === active.id)
+                        const newIndex = prevPool.findIndex(item => item.id === over.id)
 
-                    if (oldIndex === -1 || newIndex === -1) return prevPool
+                        if (oldIndex === -1 || newIndex === -1) return prevPool
 
-                    const updated = [...prevPool]
-                    const [movedItem] = updated.splice(oldIndex, 1)
-                    updated.splice(newIndex, 0, movedItem)
+                        const updated = [...prevPool]
+                        const [movedItem] = updated.splice(oldIndex, 1)
+                        updated.splice(newIndex, 0, movedItem)
 
-                    return updated
-                })
+                        return updated
+                    })
+                } else {
+                    handleGrouping(dieData, null)
+                }
+
             } else if (nestingTargetZone === 'center') {
                 handleGrouping(dieData, targetData)
             }
-        } else if (active.id === targetData.id && active.data.current?.details.groupKey) {
+        } else if (dieData.groupKey && (!targetData || targetData.id !== dieData.groupKey)) {
+            console.log('yeah boy');
+
             handleGrouping(dieData, null)
         }
 
@@ -192,7 +201,6 @@ const DiePool: React.FC<DiePoolProps> = ({
         <div className="die-pool-container">
             <DndContext
                 sensors={sensors}
-                // collisionDetection={zoneCollisionDetection}
                 collisionDetection={(args) => {
                     const cornerCollisions = closestCorners(args)
                     const zoneCollisions = zoneCollisionDetection(args)
@@ -201,7 +209,6 @@ const DiePool: React.FC<DiePoolProps> = ({
                 }}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
-                // onDragOver={handleDragOver}
                 onDragMove={handleDragMove}
                 onDragCancel={() => {
                     clearTimeout(hoverTimeout.current)
