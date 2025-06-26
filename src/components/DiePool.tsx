@@ -80,6 +80,8 @@ const DiePool: React.FC<DiePoolProps> = ({
 
         const activeData = active.data.current
         if (activeData?.details.groupKey) return
+        const overData = over.data.current
+        if (!overData) return
 
         if (collisionSet.has('center') && activeData?.type === 'die') {
             hoverTimeout.current = setTimeout(() => {
@@ -87,13 +89,24 @@ const DiePool: React.FC<DiePoolProps> = ({
                 setNestingTargetZone('center')
             }, 500) as unknown as number
         } else if (collisionSet.has('default')) {
-            setNestingTargetKey(over.id as string)
-            setNestingTargetZone('margin')
+            if (overData.type === 'group' || (overData.type === 'die' && overData.details.groupKey)) {
+                const targetKey = overData.type === 'group' ? over.id : overData.details.groupKey
+                setNestingTargetKey(targetKey as string)
+                setNestingTargetZone('center')
+            } else {
+                setNestingTargetZone('margin')
+                setNestingTargetKey(over.id as string)
+            }
+        } else {
+            setNestingTargetKey('')
+            setNestingTargetZone(null)
         }
     }
 
     const handleGrouping = (dieData: Die, targetData: PoolItem | null) => {
         if (nestingTargetKey === 'clear') addToGroupHandler(dieData, null)
+        console.log('snluo');
+
 
         setNestingTargetKey('')
         if (dieData.key === targetData?.id
@@ -103,11 +116,13 @@ const DiePool: React.FC<DiePoolProps> = ({
         if (!targetData || (targetData.type === 'die' && dieData.groupKey && !targetData.details.groupKey)) {
             addToGroupHandler(dieData, null)
         } else if (targetData.type === 'group' || (targetData.type === 'die' && targetData.details.groupKey)) {
+            console.log('blerkle');
+
             addToGroupHandler(
                 dieData,
                 targetData.type === 'die' ? targetData.details.groupKey : targetData.details.key
             )
-        } else if (targetData.type === 'die' && !dieData.groupKey) {
+        } else if (targetData.type === 'die' && !targetData.details.groupKey && !dieData.groupKey) {
             createGroupHandler([dieData, targetData.details])
         }
     }
@@ -132,13 +147,14 @@ const DiePool: React.FC<DiePoolProps> = ({
 
         console.dir({
             dieData,
-            targetData
+            targetData,
+            nestingTargetKey,
+            nestingTargetZone
         })
 
-        console.log('still here');
-
-
         if (over && active.id !== over.id && !dieData.groupKey) {
+            console.log('checkity');
+
             if (nestingTargetZone === 'margin') {
                 if (!dieData.groupKey) {
                     setPool((prevPool: PoolItem[]): PoolItem[] => {
@@ -157,12 +173,14 @@ const DiePool: React.FC<DiePoolProps> = ({
                     handleGrouping(dieData, null)
                 }
 
-            } else if (nestingTargetZone === 'center') {
+            } else if (
+                nestingTargetZone === 'center' ||
+                (targetData.type === 'die' && targetData.details.groupKey) ||
+                targetData.type === 'group'
+            ) {
                 handleGrouping(dieData, targetData)
             }
         } else if (dieData.groupKey && (!targetData || targetData.id !== dieData.groupKey)) {
-            console.log('yeah boy');
-
             handleGrouping(dieData, null)
         }
 

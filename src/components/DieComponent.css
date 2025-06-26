@@ -155,13 +155,20 @@
     animation: drop 0.15s linear;
 }
 
+.red {
+    background: red;
+    width: 100%;
+    height: 100%;
+    z-index: 8000;
+}
+
 @media (hover: hover) {
     .die-button:hover {
         background: none;
     }
 
-    .die-button:hover .die-fill {
-        filter: brightness(110%);
+    .die-fill:hover {
+        background-color: var(--fill-color);
     }
 }
 

@@ -39,10 +39,10 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }, [isHovering, isExpanded])
 
     useEffect(() => {
-        if (!isExpanded) {
-            setIsHovering(false)
-            containerRef.current?.focus()
-        }
+        // if (!isExpanded) {
+        setIsHovering(false)
+        containerRef.current?.focus()
+        // }
     }, [isExpanded])
 
     // Generic
@@ -114,22 +114,10 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         if (e.code === 'Space') cycleDisplayState()
     }
 
-    // DnD Kit
-    // const {
-    //     setNodeRef,
-    //     // transform,
-    //     // transition
-    // } = useSortable({
-    //     id: diceGroup.key,
-    //     data: { type: 'group', details: diceGroup }
-    // })
-
     const {
         attributes,
         listeners,
         setNodeRef,
-        // transform,
-        // transition,
         isDragging
     } = useSortable({
         id: diceGroup.key,
@@ -137,7 +125,6 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
             type: 'group',
             details: diceGroup
         } as PoolItem,
-        // animateLayoutChanges: defaultAnimateLayoutChanges
     })
 
     const combinedRef = (node: HTMLDivElement | null) => {
@@ -148,10 +135,6 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     // CSS - Transform Styles
     const containerStyle = {
         opacity: isDragging ? 0 : 1,
-        //     transform: CSS.Transform.toString(transform),
-        //     transition,
-        //     boxShadow: isHovering && !isExpanded ? '0 0 10px rgba(0, 0, 0, 0.2)' : 'none',
-        //     transformOrigin: 'center'
     }
 
     const styleDieGroupTransform = {
@@ -165,20 +148,20 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
 
     return (
         <div
-            // ref={setNodeRef}
             ref={combinedRef}
             tabIndex={0}
             className={
-                `dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}${poolHoverCenter ? ' pool-hover-center' : ''}`
+                `dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive ? ' pool-hover-active' : ''}${poolHoverCenter && !isExpanded ? ' pool-hover-center' : ''}`
             }
             onClick={handleContainerClick}
-            onMouseEnter={() => !isExpanded && setIsHovering(true)}
+            onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
             onKeyDown={handleKeyDown}
             style={containerStyle}
         >
             {isExpanded && (
-                <div>
+                <div
+                >
                     <h1 className='dice-group-expand-display'>{displayNum()}</h1>
                     <button className="minimize-button" onClick={handleMinimizeClick}>
                         <span className='material-symbols-outlined dice-group-close'>collapse_content</span>
@@ -195,9 +178,6 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
                     >
                         {displayNum()}
                     </h1>
-                    {/* <button className="dice-group-collapse-expand-button" onClick={handleExpandClick}>
-                        <span className='material-symbols-outlined dice-group-close'>expand_content</span>
-                    </button> */}
 
                     <span
                         {...listeners}
