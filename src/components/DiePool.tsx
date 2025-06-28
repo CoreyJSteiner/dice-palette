@@ -6,7 +6,8 @@ import type { Die, PoolItem, PoolItemDie } from "./DiePalleteTypes"
 import {
     DndContext,
     DragOverlay,
-    closestCorners,
+    // closestCorners,
+    rectIntersection,
     useSensor,
     useSensors,
     MouseSensor,
@@ -63,7 +64,13 @@ const DiePool: React.FC<DiePoolProps> = ({
     const handleDragMove = (e: DragOverEvent) => {
         const { active, over, collisions } = e
 
-        if (!over || !collisions || over.id === active.id) return
+        if (!over || !collisions || over.id === active.id) {
+            console.log('nawr');
+
+            setNestingTargetKey('')
+            setNestingTargetZone(null)
+            return
+        }
 
         const collisionSet = collisions.reduce((acc, c) => {
             if (c.id === over.id && c.data?.zone) {
@@ -87,12 +94,14 @@ const DiePool: React.FC<DiePoolProps> = ({
             hoverTimeout.current = setTimeout(() => {
                 setNestingTargetKey(over.id as string)
                 setNestingTargetZone('center')
-            }, 500) as unknown as number
+            }, 500)
         } else if (collisionSet.has('default')) {
             if (overData.type === 'group' || (overData.type === 'die' && overData.details.groupKey)) {
-                const targetKey = overData.type === 'group' ? over.id : overData.details.groupKey
-                setNestingTargetKey(targetKey as string)
-                setNestingTargetZone('center')
+                hoverTimeout.current = setTimeout(() => {
+                    const targetKey = overData.type === 'group' ? over.id : overData.details.groupKey
+                    setNestingTargetKey(targetKey as string)
+                    setNestingTargetZone('center')
+                }, 500)
             } else {
                 setNestingTargetZone('margin')
                 setNestingTargetKey(over.id as string)
@@ -104,7 +113,7 @@ const DiePool: React.FC<DiePoolProps> = ({
     }
 
     const handleGrouping = (dieData: Die, targetData: PoolItem | null) => {
-        if (nestingTargetKey === 'clear') addToGroupHandler(dieData, null)
+        // if (nestingTargetKey === 'clear') addToGroupHandler(dieData, null)
         console.log('snluo');
 
 
@@ -220,7 +229,8 @@ const DiePool: React.FC<DiePoolProps> = ({
             <DndContext
                 sensors={sensors}
                 collisionDetection={(args) => {
-                    const cornerCollisions = closestCorners(args)
+                    // const cornerCollisions = closestCorners(args)
+                    const cornerCollisions = rectIntersection(args)
                     const zoneCollisions = zoneCollisionDetection(args)
 
                     return [...cornerCollisions, ...zoneCollisions]

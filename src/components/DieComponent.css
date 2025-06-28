@@ -284,7 +284,6 @@
     min-width: 15rem;
     min-height: 10rem;
     max-width: 25rem;
-    max-height: 25rem;
     background: grey;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     overflow: visible;
@@ -483,6 +482,25 @@
 
 .pool-hover-center {
     animation: center-pulse 1s ease-in-out infinite;
+    z-index: 10;
+}
+
+@keyframes center-pulse-light {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.01);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.pool-hover-center-light {
+    animation: center-pulse-light 1s ease-in-out infinite;
     z-index: 10;
 }
 

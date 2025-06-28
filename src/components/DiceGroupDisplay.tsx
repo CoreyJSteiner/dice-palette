@@ -151,7 +151,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
             ref={combinedRef}
             tabIndex={0}
             className={
-                `dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive ? ' pool-hover-active' : ''}${poolHoverCenter && !isExpanded ? ' pool-hover-center' : ''}`
+                `dice-group-container ${isExpanded ? 'expanded' : ''} ${poolHoverActive && !isExpanded ? ' pool-hover-active' : ''}${poolHoverCenter ? (isExpanded ? ' pool-hover-center-light' : ' pool-hover-center') : ''}`
             }
             onClick={handleContainerClick}
             onMouseEnter={() => setIsHovering(true)}
@@ -160,8 +160,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
             style={containerStyle}
         >
             {isExpanded && (
-                <div
-                >
+                <div>
                     <h1 className='dice-group-expand-display'>{displayNum()}</h1>
                     <button className="minimize-button" onClick={handleMinimizeClick}>
                         <span className='material-symbols-outlined dice-group-close'>collapse_content</span>
