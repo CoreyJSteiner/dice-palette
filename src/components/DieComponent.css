@@ -17,6 +17,7 @@
 
 .die-pallete {
     display: flex;
+    margin: 1rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -28,6 +29,13 @@
     box-shadow:
         0.15rem 0.15rem 0.25rem rgb(163, 163, 163),
         0 0 0.2rem rgb(137, 137, 137) inset;
+}
+
+@media screen and (max-width: 900px) {
+    .die-pallete {
+        height: 80vh;
+        min-height: 400px;
+    }
 }
 
 .die-pallete-roll-all {
@@ -71,6 +79,12 @@
     border: 1px solid #7a7a7a;
     border-radius: 1rem 1rem 1rem 1rem;
     box-shadow: 0 0 0.3rem rgb(151, 156, 161) inset;
+}
+
+@media screen and (max-width: 900px) {
+    .die-options {
+        min-height: 100px
+    }
 }
 
 .die-options:focus {
@@ -129,11 +143,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3rem;
+    height: 3rem;
     padding: 0.1rem;
     border: none;
     background: none;
+}
+
+@media screen and (max-width: 900px) {
+    .die-button {
+        width: 15%;
+        height: auto;
+    }
 }
 
 @keyframes drop {
@@ -190,9 +211,9 @@
 
 .die-img-container {
     position: relative;
-    display: inline-block;
     width: 100%;
-    height: 100%;
+    padding-top: 100%;
+    height: auto;
     --fill-color: blue;
     --value-font-color: rgb(255, 247, 0);
 }
@@ -245,6 +266,13 @@
     z-index: 1;
 }
 
+@media screen and (max-width: 900px) {
+    .die-display {
+        width: 15%;
+        height: auto;
+    }
+}
+
 @media (hover: hover) {
     .die-display:hover {
         border: none;
@@ -260,6 +288,7 @@
 
 .die-display-value {
     position: absolute;
+    width: 100%;
     color: var(--value-font-color);
     font-family: Arial, Helvetica, sans-serif;
     font-weight: bolder;
@@ -269,19 +298,27 @@
     z-index: 2;
 }
 
+@media screen and (max-width: 900px) {
+    .die-display-value {
+        font-size: 2rem;
+    }
+}
+
 .die-display-value::before,
 .die-display-value::after {
     content: attr(data-text);
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 100%;
-    height: 100%;
-    -webkit-text-stroke: 0.425rem var(--value-font-border-color);
+    -webkit-text-stroke: 0.55rem var(--value-font-border-color);
 }
 
 .die-display-value::after {
-    -webkit-text-stroke: 0.2rem black;
+    position: absolute;
+    width: 100%;
+    -webkit-text-stroke: 0.25rem black;
     z-index: 1;
 }
 
