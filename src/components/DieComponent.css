@@ -69,8 +69,6 @@
     height: 4rem;
     margin: var(--palette-edge-space) var(--palette-edge-space) 0rem;
     background: rgb(215, 222, 226);
-    /* background: white; */
-    /* background: none; */
     border: 1px solid #7a7a7a;
     border-radius: 1rem 1rem 1rem 1rem;
     box-shadow: 0 0 0.3rem rgb(151, 156, 161) inset;
@@ -89,8 +87,6 @@
     width: 40rem;
     height: 16rem;
     margin: 0rem var(--palette-edge-space) 0rem var(--palette-edge-space);
-    /* background: var(--die-pool-background-color); */
-    /* background: white; */
     background: none;
     border-radius: 0rem 0rem 1rem 1rem;
 }
@@ -269,12 +265,24 @@
     font-weight: bolder;
     font-size: 1.75rem;
     padding: 0.1rem;
-    text-shadow:
-        -1px -1px 0 var(--value-font-border-color),
-        1px -1px 0 var(--value-font-border-color),
-        -1px 1px 0 var(--value-font-border-color),
-        1px 1px 0 var(--value-font-border-color);
+    paint-order: stroke fill;
     z-index: 2;
+}
+
+.die-display-value::before,
+.die-display-value::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-text-stroke: 0.425rem var(--value-font-border-color);
+}
+
+.die-display-value::after {
+    -webkit-text-stroke: 0.2rem black;
+    z-index: 1;
 }
 
 .dice-group-container {

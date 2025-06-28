@@ -119,12 +119,12 @@ const DiePallete: React.FC = () => {
     }
 
     // Handlers
-    const handleNewDie = (dieSides: number, groupKey?: string | null): void => {
+    const handleNewDie = (dieSides: number, groupKey?: string | null, fillColor?: string | null): void => {
         const newDie = {
             key: crypto.randomUUID(),
             dieSides: dieSides,
             groupKey: groupKey,
-            fillColor: 'red',
+            fillColor: fillColor || 'red',
             fontColor: 'white'
         }
         if (groupKey) {

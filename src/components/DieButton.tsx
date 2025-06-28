@@ -5,7 +5,7 @@ type DieButtonProps = {
     dieSides: number
     fillColor?: string
     addGroup?: string | null
-    onAddDie: (dieSides: number, groupKey?: string | null) => void
+    onAddDie: (dieSides: number, groupKey?: string | null, fillColor?: string | null) => void
 }
 
 const DieButton: React.FC<DieButtonProps> = ({
@@ -17,7 +17,7 @@ const DieButton: React.FC<DieButtonProps> = ({
     return (
         <button
             className='die-button'
-            onClick={() => onAddDie(dieSides, addGroup)}
+            onClick={() => onAddDie(dieSides, addGroup, fillColor)}
         >
             <DieImage imageName={imageName} fillColor={fillColor} />
         </button>

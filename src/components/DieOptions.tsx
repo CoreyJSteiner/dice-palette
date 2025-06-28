@@ -3,7 +3,7 @@ import DieButton from "./DieButton"
 import { useState, useEffect, useRef } from "react"
 
 type DieOptionsProps = {
-    onAddDie: (dieSides: number, groupKey?: string | null) => void
+    onAddDie: (dieSides: number, groupKey?: string | null, fillColor?: string | null) => void
 }
 
 const DieOptions: React.FC<DieOptionsProps> = ({ onAddDie }) => {
