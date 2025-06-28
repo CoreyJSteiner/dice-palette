@@ -33,7 +33,7 @@
 
 @media screen and (max-width: 900px) {
     .die-pallete {
-        height: 90vh;
+        height: calc(var(--vh, 1vh) * 90);
     }
 }
 
