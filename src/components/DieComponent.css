@@ -35,8 +35,9 @@
 
 @media screen and (max-width: 900px) {
     .die-pallete {
+        margin: 0 auto;
         width: 90dvw;
-        height: 90dvh
+        height: 80dvh
     }
 }
 
