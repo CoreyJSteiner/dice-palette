@@ -16,6 +16,7 @@
 }
 
 .die-pallete {
+    position: fixed;
     display: flex;
     margin: 0.5rem;
     flex-direction: column;
@@ -34,7 +35,8 @@
 
 @media screen and (max-width: 900px) {
     .die-pallete {
-        height: calc(var(--vh, 1vh) * 90);
+        width: 90vw;
+        height: 90vh
     }
 }
 
