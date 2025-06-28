@@ -43,7 +43,6 @@ export const zoneCollisionDetection: CollisionDetection = (args) => {
     const { droppableContainers, droppableRects, pointerCoordinates } = args
     const collisions: Collision[] = []
 
-    // We need the pointer coordinates
     if (!pointerCoordinates) return collisions
 
     const point = { x: pointerCoordinates.x, y: pointerCoordinates.y }
@@ -52,7 +51,6 @@ export const zoneCollisionDetection: CollisionDetection = (args) => {
         const rect = droppableRects.get(droppable.id)
         if (!rect) continue
 
-        // Create our custom rect from the droppable
         const customRect = createRect(
             rect.top,
             rect.left,
@@ -60,10 +58,8 @@ export const zoneCollisionDetection: CollisionDetection = (args) => {
             rect.height
         )
 
-        // Calculate center zone (60% of the area)
         const centerZone = getCenterZone(customRect)
 
-        // Check if pointer is in center zone
         if (containsPoint(centerZone, point)) {
             collisions.push({
                 id: droppable.id,
