@@ -22,27 +22,15 @@ const DiePallete: React.FC = () => {
         }
 
         const handleKeyUp = (e: KeyboardEvent): void => {
-            heldKeysRef.current.delete(e.code);
+            heldKeysRef.current.delete(e.code)
         }
 
-        window.addEventListener('keydown', handleKeyDown);
-        window.addEventListener('keyup', handleKeyUp);
+        window.addEventListener('keydown', handleKeyDown)
+        window.addEventListener('keyup', handleKeyUp)
         return (): void => {
-            window.removeEventListener('keydown', handleKeyDown);
-            window.removeEventListener('keyup', handleKeyUp);
-        };
-    }, []);
-
-    useEffect(() => {
-        const setVh = () => {
-            const vh = window.innerHeight * 0.01
-            document.documentElement.style.setProperty('--vh', `${vh}px`)
+            window.removeEventListener('keydown', handleKeyDown)
+            window.removeEventListener('keyup', handleKeyUp)
         }
-
-        setVh()
-        window.addEventListener('resize', setVh)
-
-        return () => window.removeEventListener('resize', setVh)
     }, [])
 
     useEffect(() => {
@@ -178,7 +166,6 @@ const DiePallete: React.FC = () => {
                         const updatedGroup = structuredClone(poolItem)
                         updatedGroup.details.dice = poolItem.details.dice.filter(die => die.key !== inputDieKey)
                         newPoolItems.push(updatedGroup)
-                        console.dir(updatedGroup)
                     } else {
                         newPoolItems.push(poolItem)
                     }
