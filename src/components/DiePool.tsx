@@ -30,6 +30,7 @@ type DiePoolProps = {
     resetClickHandler: () => void
     addToGroupHandler: (dieData: Die, groupKey?: string | null) => void
     createGroupHandler: (dice: Array<Die>) => void
+    destroyDieHandler: (dieKey: string) => void
     destroyGroupHandler: (groupKey: string) => void
     rollDiceGroupHandler: (groupKey: string) => void
 }
@@ -43,6 +44,7 @@ const DiePool: React.FC<DiePoolProps> = ({
     dieInGroupClickHandler,
     addToGroupHandler,
     createGroupHandler,
+    destroyDieHandler,
     destroyGroupHandler,
     rollDiceGroupHandler
 }) => {
@@ -113,10 +115,6 @@ const DiePool: React.FC<DiePoolProps> = ({
     }
 
     const handleGrouping = (dieData: Die, targetData: PoolItem | null) => {
-        // if (nestingTargetKey === 'clear') addToGroupHandler(dieData, null)
-        console.log('snluo');
-
-
         setNestingTargetKey('')
         if (dieData.key === targetData?.id
             || (dieData.groupKey && targetData?.type === 'die' && dieData.groupKey === targetData?.details.groupKey)
@@ -125,8 +123,6 @@ const DiePool: React.FC<DiePoolProps> = ({
         if (!targetData || (targetData.type === 'die' && dieData.groupKey && !targetData.details.groupKey)) {
             addToGroupHandler(dieData, null)
         } else if (targetData.type === 'group' || (targetData.type === 'die' && targetData.details.groupKey)) {
-            console.log('blerkle');
-
             addToGroupHandler(
                 dieData,
                 targetData.type === 'die' ? targetData.details.groupKey : targetData.details.key
@@ -210,6 +206,7 @@ const DiePool: React.FC<DiePoolProps> = ({
                 poolHoverCenter={isActive && isCenter}
                 diceGroup={poolItem.details}
                 dieInGroupClickHandler={dieInGroupClickHandler}
+                destroyDieHandler={destroyDieHandler}
                 destroyGroupHandler={destroyGroupHandler}
                 rollDiceGroupHandler={rollDiceGroupHandler}
             />
@@ -220,6 +217,7 @@ const DiePool: React.FC<DiePoolProps> = ({
                 poolHoverCenter={isActive && isCenter}
                 die={poolItem.details}
                 dieClickHandler={dieClickHandler}
+                destroyDieHandler={destroyDieHandler}
             />
         }
     }
@@ -229,7 +227,6 @@ const DiePool: React.FC<DiePoolProps> = ({
             <DndContext
                 sensors={sensors}
                 collisionDetection={(args) => {
-                    // const cornerCollisions = closestCorners(args)
                     const cornerCollisions = rectIntersection(args)
                     const zoneCollisions = zoneCollisionDetection(args)
 

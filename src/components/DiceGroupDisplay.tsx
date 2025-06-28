@@ -10,6 +10,7 @@ type DiceGroupDisplayProps = {
     poolHoverActive: boolean
     poolHoverCenter?: boolean
     dieInGroupClickHandler: (groupKey: string, dieKey: string) => void
+    destroyDieHandler: (dieKey: string) => void
     destroyGroupHandler: (groupKey: string) => void
     rollDiceGroupHandler: (groupKey: string) => void
 }
@@ -20,6 +21,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     poolHoverActive,
     poolHoverCenter,
     dieInGroupClickHandler,
+    destroyDieHandler,
     destroyGroupHandler,
     rollDiceGroupHandler
 }) => {
@@ -80,18 +82,12 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
         setIsExpanded(false)
     }
 
-    // const handleExpandClick = (e: React.MouseEvent) => {
-    //     e.stopPropagation()
-    //     setIsExpanded(true)
-    // }
-
     const handleRightClickOnCollapse = (e: React.MouseEvent) => {
         e.preventDefault()
         rollDiceGroupHandler(diceGroup.key)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        console.log('oy')
         if (e.repeat) return
         const cycleDisplayState = () => {
             e.preventDefault()
@@ -110,7 +106,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
             destroyGroupHandler(diceGroup.key)
         }
 
-        if (e.code === 'Backspace' || e.code === 'Delete') destroyGroupSelf()
+        if ((e.code === 'Backspace' || e.code === 'Delete') && !isExpanded) destroyGroupSelf()
         if (e.code === 'Space') cycleDisplayState()
     }
 
@@ -196,6 +192,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
                             poolHoverActive={false}
                             die={die}
                             dieClickHandler={() => handleDieInGroupClick(die.key)}
+                            destroyDieHandler={destroyDieHandler}
                         />
                     </div>
                 ))}

@@ -157,6 +157,27 @@ const DiePallete: React.FC = () => {
         }))
     }
 
+    const handleDestroyDie = (inputDieKey: string): void => {
+        setPoolState(prevPoolState => {
+            const newPoolItems: PoolItem[] = []
+            prevPoolState.forEach(poolItem => {
+                if (poolItem.type === 'die' && poolItem.id !== inputDieKey) newPoolItems.push(poolItem)
+                if (poolItem.type === 'group') {
+                    if (poolItem.details.dice.some(die => die.key === inputDieKey)) {
+                        const updatedGroup = structuredClone(poolItem)
+                        updatedGroup.details.dice = poolItem.details.dice.filter(die => die.key !== inputDieKey)
+                        newPoolItems.push(updatedGroup)
+                        console.dir(updatedGroup)
+                    } else {
+                        newPoolItems.push(poolItem)
+                    }
+                }
+            })
+
+            return newPoolItems
+        })
+    }
+
     const handleDestroyGroup = (groupKey: string): void => {
         const dieToPoolItem = (die: Die): PoolItem => {
             return { id: die.key, type: 'die', details: { ...die, groupKey: null } }
@@ -324,6 +345,7 @@ const DiePallete: React.FC = () => {
                 dieInGroupClickHandler={handleDieInGroupClick}
                 addToGroupHandler={handleAddDieToGroup}
                 createGroupHandler={handleCreateGroup}
+                destroyDieHandler={handleDestroyDie}
                 destroyGroupHandler={handleDestroyGroup}
                 rollDiceGroupHandler={handleRollDiceGroup}
             />

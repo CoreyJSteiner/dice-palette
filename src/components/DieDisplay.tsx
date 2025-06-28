@@ -1,5 +1,5 @@
 import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable"
-// import { CSS } from "@dnd-kit/utilities"
+import { useState, useEffect, useRef } from 'react'
 import type { Die, PoolItem } from "./DiePalleteTypes"
 import DieAndValue from "./DieAndValue"
 
@@ -7,7 +7,8 @@ type DieDisplayProps = {
     die: Die
     poolHoverActive: boolean
     poolHoverCenter?: boolean
-    dieClickHandler?: (key: string) => void
+    dieClickHandler: (key: string) => void
+    destroyDieHandler: (key: string) => void
 }
 
 const DieDisplay: React.FC<DieDisplayProps> = ({
@@ -15,7 +16,17 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
     poolHoverActive,
     poolHoverCenter,
     dieClickHandler,
+    destroyDieHandler,
 }) => {
+    const [isHovering, setIsHovering] = useState<boolean>(false)
+    const buttonRef = useRef<HTMLButtonElement>(null)
+
+    // Effects
+    useEffect(() => {
+        if (isHovering && buttonRef.current) {
+            buttonRef.current.focus()
+        }
+    }, [isHovering])
 
     // Handlers
     const handleRightClick = (e: React.MouseEvent) => {
@@ -25,14 +36,22 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
         }
     }
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.repeat) return
+
+        const destroyDieSelf = () => {
+            e.preventDefault()
+            destroyDieHandler(die.key)
+        }
+
+        if (e.code === 'Backspace' || e.code === 'Delete') destroyDieSelf()
+    }
 
     // DnD Kit
     const {
         attributes,
         listeners,
         setNodeRef,
-        // transform,
-        // transition,
         isDragging
     } = useSortable({
         id: die.key,
@@ -40,24 +59,28 @@ const DieDisplay: React.FC<DieDisplayProps> = ({
         animateLayoutChanges: defaultAnimateLayoutChanges
     })
 
+    const combinedRef = (node: HTMLButtonElement | null) => {
+        setNodeRef(node)
+        buttonRef.current = node
+    }
+
     // CSS - Transform style
     const styleTransform = {
-        // transform: CSS.Transform.toString(transform),
-        // transition,
         opacity: isDragging ? 0 : 1,
-        // opacity: 0
-        // display: 'none'
     }
 
     return (
         <button
-            ref={setNodeRef}
+            ref={combinedRef}
             {...listeners}
             {...attributes}
             draggable='true'
             data-id={die.key}
             className={`die-display${poolHoverActive ? ' pool-hover-active' : ''}${poolHoverCenter ? ' pool-hover-center' : ''}`}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
             onContextMenu={handleRightClick}
+            onKeyDown={handleKeyDown}
             style={styleTransform}
         >
             <DieAndValue die={die} />
