@@ -45,12 +45,12 @@ const DieOptions: React.FC<DieOptionsProps> = ({ onAddDie }) => {
             onKeyDown={handleKeyDown}
             onKeyUp={handleKeyUp}
         >
-            <DieButton imageName="d4" dieSides={4} onAddDie={onAddDie} addGroup={addGroup} />
-            <DieButton imageName="d6" dieSides={6} onAddDie={onAddDie} addGroup={addGroup} />
-            <DieButton imageName="d8" dieSides={8} onAddDie={onAddDie} addGroup={addGroup} />
-            <DieButton imageName="d10" dieSides={10} onAddDie={onAddDie} addGroup={addGroup} />
-            <DieButton imageName="d12" dieSides={12} onAddDie={onAddDie} addGroup={addGroup} />
-            <DieButton imageName="d20" dieSides={20} onAddDie={onAddDie} addGroup={addGroup} />
+            <DieButton imageName="d4" dieSides={4} onAddDie={onAddDie} addGroup={addGroup} fillColor="red" />
+            <DieButton imageName="d6" dieSides={6} onAddDie={onAddDie} addGroup={addGroup} fillColor="orange" />
+            <DieButton imageName="d8" dieSides={8} onAddDie={onAddDie} addGroup={addGroup} fillColor="yellow" />
+            <DieButton imageName="d10" dieSides={10} onAddDie={onAddDie} addGroup={addGroup} fillColor="rgb(10, 180, 10)" />
+            <DieButton imageName="d12" dieSides={12} onAddDie={onAddDie} addGroup={addGroup} fillColor="rgb(103, 182, 255)" />
+            <DieButton imageName="d20" dieSides={20} onAddDie={onAddDie} addGroup={addGroup} fillColor="rgb(238, 83, 238)" />
         </div>
     )
 }

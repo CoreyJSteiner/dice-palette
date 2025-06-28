@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { type CSSProperties } from 'react'
 
 type DieImageProps = {
     imageName?: string
@@ -7,7 +7,7 @@ type DieImageProps = {
 
 const IMG_BASE_PATH = 'assets/'
 
-const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20', fillColor = 'red' }) => {
+const DieImage: React.FC<DieImageProps> = ({ imageName = 'd20', fillColor = 'hsl(0, 0.00%, 100.00%)' }) => {
 
     // CSS - Vars
     const styleFill: CSSProperties = {

@@ -317,7 +317,7 @@ const DiePallete: React.FC = () => {
             <DieOptions onAddDie={handleNewDie} />
             <DiePool
                 pool={poolState}
-                setPool={setPoolState} // <-- Add this
+                setPool={setPoolState}
                 clearClickHandler={handleClearDice}
                 resetClickHandler={handleResetDice}
                 dieClickHandler={handleDieClick}

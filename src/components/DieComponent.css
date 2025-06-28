@@ -12,7 +12,7 @@
 
 :root {
     --palette-edge-space: 0.65rem;
-    --die-pool-background-color: hsl(0, 34%, 88%);
+    --die-pool-background-color: #e7e7e7;
 }
 
 .die-pallete {
@@ -22,8 +22,12 @@
     align-items: center;
     width: fit-content;
     height: fit-content;
-    background: #c1c1c1;
+    background: #e7e7e7;
     border-radius: 1rem;
+    border: 1px solid #414141;
+    box-shadow:
+        0.15rem 0.15rem 0.25rem rgb(137, 137, 137),
+        0 0 0.2rem rgb(137, 137, 137) inset;
 }
 
 .die-pallete-roll-all {
@@ -33,24 +37,25 @@
     width: 100%;
     height: 4rem;
     padding: 2rem;
-    background: rgb(0, 138, 0);
-    ;
+    background: rgb(4, 140, 4);
     border: none;
     border-radius: 0rem 0rem 1rem 1rem;
+    box-shadow: 0 0 0.25rem rgb(3, 91, 3) inset;
     color: white;
     font-size: 1.3rem;
-    transition: font-size 0.1s ease-in-out;
+    transition: all 0.1s ease-in-out;
 }
 
 @media (hover: hover) {
     .die-pallete-roll-all:hover {
         background: rgb(4, 154, 4);
-        font-size: 1.35rem;
+        /* font-size: 1.35rem; */
     }
 }
 
 .die-pallete-roll-all:active {
     font-size: 1.25rem;
+    box-shadow: 0 0 0.1rem rgb(3, 91, 3) inset;
     transform: none;
 }
 
@@ -63,8 +68,12 @@
     width: 36rem;
     height: 4rem;
     margin: var(--palette-edge-space) var(--palette-edge-space) 0rem;
-    background: rgb(225, 225, 255);
-    border-radius: 1rem 1rem 0rem 0rem;
+    background: rgb(215, 222, 226);
+    /* background: white; */
+    /* background: none; */
+    border: 1px solid #7a7a7a;
+    border-radius: 1rem 1rem 1rem 1rem;
+    box-shadow: 0 0 0.3rem rgb(151, 156, 161) inset;
 }
 
 .die-options:focus {
@@ -79,22 +88,25 @@
     align-items: center;
     width: 40rem;
     height: 16rem;
-    margin: 0rem var(--palette-edge-space) var(--palette-edge-space);
-    background: var(--die-pool-background-color);
+    margin: 0rem var(--palette-edge-space) 0rem var(--palette-edge-space);
+    /* background: var(--die-pool-background-color); */
+    /* background: white; */
+    background: none;
     border-radius: 0rem 0rem 1rem 1rem;
 }
 
 .button-bottom-container {
     position: absolute;
-    bottom: 1rem;
+    bottom: 0.5rem;
     right: 1rem;
     z-index: 100;
 }
 
 .button-bottom {
     background: var(--die-pool-background-color);
-    border: none;
-    transition: transform 0.2s ease-in-out;
+    margin: 0.25rem;
+    border: 1px solid #7a7a7a;
+    transition: all 0.15s ease-in-out;
 }
 
 @media screen and (max-width: 900px) {
@@ -106,13 +118,15 @@
 @media (hover: hover) {
     .button-bottom:hover {
         background-color: var(--die-pool-background-color);
-        transform: scale(108%);
+        box-shadow: 0.1rem 0.1rem 0.1rem rgb(180, 180, 180);
+        transform: scale(103%);
     }
 }
 
 .button-bottom:active {
     background-color: var(--die-pool-background-color);
-    transform: scale(90%);
+    transform: scale(95%);
+    transition: all 0.05s ease-in-out;
 }
 
 .die-button {
@@ -153,6 +167,12 @@
 
 .die-button:active>* {
     animation: drop 0.15s linear;
+}
+
+@media (hover: hover) {
+    .die-button:hover {
+        transform: scale(103%);
+    }
 }
 
 .red {
