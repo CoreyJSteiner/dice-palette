@@ -143,7 +143,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }
 
     const styleDiceContentTransform = {
-        padding: isExpanded ? '1.5rem' : '0', transition: 'all 0.3s ease'
+        padding: isExpanded ? '' : '0', transition: 'all 0.3s ease'
     }
 
     return (
