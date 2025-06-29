@@ -105,6 +105,20 @@
     outline: none;
 }
 
+.garbage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.3rem;
+    width: 100%;
+    height: 2.25rem;
+    margin: 0.25rem;
+    background: rgb(230, 199, 199);
+    border-radius: 1rem 1rem 1rem 1rem;
+    color: rgb(175, 70, 70);
+    z-index: -2;
+}
+
 .die-pool-container {
     position: relative;
     display: flex;
@@ -141,7 +155,9 @@
 .button-bottom {
     background: var(--die-pool-background-color);
     margin: 0.25rem;
+    height: 2rem;
     border: 1px solid #7a7a7a;
+    border-radius: 3rem;
     transition: all 0.15s ease-in-out;
 }
 
@@ -277,7 +293,6 @@
     align-items: center;
     width: 100%;
     height: 80%;
-    /* max-height: ; */
     overflow-x: scroll;
     overflow-y: scroll;
     padding: 1rem;
@@ -606,4 +621,8 @@
 .pool-hover-active.die-display,
 .pool-hover-active.dice-group-container {
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.display-none {
+    display: none;
 }

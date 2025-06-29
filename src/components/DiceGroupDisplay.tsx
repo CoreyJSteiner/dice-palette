@@ -183,7 +183,7 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
                 </div>
             )}
 
-            <div className="dice-content" style={styleDiceContentTransform}>
+            <div className={`dice-content ${isExpanded ? '' : 'display-none'}`} style={styleDiceContentTransform}>
                 {diceGroup.dice.map(die => (
                     <div key={die.key} style={styleDieGroupTransform}>
                         <DieDisplay

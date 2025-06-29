@@ -177,6 +177,8 @@ const DiePallete: React.FC = () => {
     }
 
     const handleDestroyGroup = (groupKey: string): void => {
+        console.log('bye grous');
+
         const dieToPoolItem = (die: Die): PoolItem => {
             return { id: die.key, type: 'die', details: { ...die, groupKey: null } }
         }
