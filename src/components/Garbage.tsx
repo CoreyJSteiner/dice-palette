@@ -1,8 +1,6 @@
 import type React from "react"
 import { useDroppable, } from "@dnd-kit/core"
 
-// type GarbageProps = {}
-
 const Garbage: React.FC = () => {
     // DnD Kit
     const { setNodeRef: setGarbageRef } = useDroppable({

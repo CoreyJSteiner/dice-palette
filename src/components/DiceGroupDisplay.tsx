@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { useSortable } from "@dnd-kit/sortable"
-// import { CSS } from "@dnd-kit/utilities"
 import type { PoolItem, DiceGroup } from "./DiePalleteTypes"
 import DieDisplay from "./DieDisplay"
 
@@ -37,6 +36,8 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     useEffect(() => {
         if (isHovering && containerRef.current && !isExpanded) {
             containerRef.current.focus()
+        } else if (containerRef.current) {
+            containerRef.current.blur()
         }
     }, [isHovering, isExpanded])
 
