@@ -109,7 +109,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     width: 95%;
     height: 60%;
@@ -120,7 +120,7 @@
 
 @media screen and (max-width: 900px) and (orientation: portrait) {
     .die-pool-container {
-        height: 76%;
+        height: 80%;
     }
 }
 
@@ -132,10 +132,9 @@
     z-index: 100;
 }
 
-@media (max-width: 900px) {
+@media screen and (max-width: 900px) {
     .button-bottom-container {
         margin: 0;
-        justify-content: center;
     }
 }
 
@@ -298,7 +297,7 @@
 
 @media screen and (max-width: 900px) {
     .die-display {
-        width: 3rem;
+        width: 4rem;
         height: auto;
     }
 }
