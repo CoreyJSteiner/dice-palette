@@ -42,10 +42,8 @@ const DiceGroupDisplay: React.FC<DiceGroupDisplayProps> = ({
     }, [isHovering, isExpanded])
 
     useEffect(() => {
-        // if (!isExpanded) {
         setIsHovering(false)
         containerRef.current?.focus()
-        // }
     }, [isExpanded])
 
     // Generic
